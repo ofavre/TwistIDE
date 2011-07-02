@@ -1,0 +1,23 @@
+TwistIDE
+========
+
+Yet another IDE... but for C/C++ this time!
+Yup, a dedicated IDE to this family of languages.
+And it's not written in Java so you should have plenty of memory still free...
+
+Why another IDE?
+----------------
+
+C/C++ IDEs are not quite well functional.
+Their support for the language is often approximate,
+and code completion is just a pain.
+
+Why not improving an existing IDE?
+There are beautiful libs out there that are particularly well suited for this language family,
+that are just waiting to be used. And Java IDEs are just too heavy for anything.
+
+What is TwistIDE made of?
+-------------------------
+
+We use LLVM through CLang for the C family language support.
+LLDB is used for debugging.
