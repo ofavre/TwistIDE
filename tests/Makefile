@@ -2,18 +2,18 @@
 .DEFAULT_GOAL = all
 .SECONDARY: build/%.o build/%.o.d
 
-PROG_NAME := embedding_konsole_vim
+PROG_NAME := embedding_gvim
 
 CXX := g++
 CXX_FLAGS := -c -Wall -Wextra
 CXX_FLAGS_DEBUG := -g3 -O0
 CXX_FLAGS_RELEASE := -g1 -O2
-CXX_LIBS := -I`kde4-config --path include`/KDE `pkg-config --cflags gtkmm-2.4 QtGui`
+CXX_LIBS := `pkg-config --cflags gtkmm-2.4`
 LN := g++
 LN_FLAGS :=
 LN_FLAGS_DEBUG := -g3
 LN_FLAGS_RELEASE := -g1
-LN_LIBS := -L`kde4-config --path lib | sed -e 's/:/ -L/g'` -lkparts `pkg-config --libs gtkmm-2.4 QtGui`
+LN_LIBS := `pkg-config --libs gtkmm-2.4`
 
 all: compile
 

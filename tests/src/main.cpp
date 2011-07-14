@@ -1,68 +1,76 @@
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 #include <gtkmm.h>
 #include <gtkmm/socket.h>
 
-#include <QWidget>
-#include <QX11EmbedWidget>
-#include <KParts/Part>
-#include <KApplication>
-#include <kde_terminal_interface.h>
-#include <KPluginFactory>
-#include <KPluginLoader>
-
-class Konsole : public Gtk::Window
+class GVim : public Gtk::Window
 {
 	public:
-		Konsole()
+		GVim()
 		{
-			add(mSocket);
+			mSocket.signal_realize().connect(sigc::mem_fun(*this, &GVim::on_mSocket_realize));
+			mSocket.signal_plug_removed().connect(sigc::mem_fun(*this, &GVim::on_mSocket_plug_removed));
+			mSocket.signal_plug_added().connect(sigc::mem_fun(*this, &GVim::on_mSocket_plug_added));
 
+			mBox.pack_start(mSocket, true, true);
+			mSocket.set_size_request(100,100);
+
+			add(mBox);
 			set_default_size(960, 512);
 			set_visible(true);
+			show_all();
 		}
 
-		virtual ~Konsole()
+		virtual ~GVim()
 		{
-			if (mKonsolePart) delete mKonsolePart;
 		}
 
-		void makeKonsole()
+		void makeGVim()
 		{
 			Gdk::NativeWindow xid = mSocket.get_id();
-			std::cout << "Parent-id: " << xid << std::endl;
+			std::stringstream cmd;
+			cmd << "gvim --socketid " << xid << " &";
+			std::cout << cmd.str() << std::endl;
 
-			mSocketQ.embedInto(xid);
-
-			KPluginFactory* factory = KPluginLoader("konsolepart").factory();
-			if (!factory)
-				factory = KPluginLoader("libkonsolepart").factory(); // deprecated name
-			mKonsolePart = factory ? (factory->create<KParts::Part>(&mSocketQ)) : 0;
-
-			if (mKonsolePart == NULL) {
-				std::cerr << "Unable to create a Konsole::Part" << std::endl;
-				exit(EXIT_FAILURE);
+			int rtn = system(cmd.str().c_str());
+			if (rtn != 0)
+			{
+				perror("Cannot run gvim!");
 			}
+		}
 
-			mSocketQ.show();
+		void on_mSocket_realize()
+		{
+			makeGVim();
+		}
+
+		void on_mSocket_plug_added()
+		{
+			std::cout << "GVim started!" << std::endl;
+			mSocket.get_plug_window()->focus(0); // TODO FIX
+		}
+
+		bool on_mSocket_plug_removed()
+		{
+			std::cout << "GVim exitted, quitting" << std::endl;
+			Gtk::Main::instance()->quit();
+			return true;
 		}
 
 	protected:
+		Gtk::VBox       mBox;
 		Gtk::Socket     mSocket;
-		QX11EmbedWidget mSocketQ;
-		KParts::Part*   mKonsolePart;
 };
 
 int main(int argc, char** argv)
 {
-	QApplication app(argc, argv);
 	Gtk::Main kit(argc, argv);
 
-	Konsole k;
-	k.makeKonsole();
+	GVim w;
 
-	kit.run(k);
+	kit.run(w);
 
 	return 0;
 }
