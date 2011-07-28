@@ -13,7 +13,7 @@ LN := g++
 LN_FLAGS :=
 LN_FLAGS_DEBUG := -g3
 LN_FLAGS_RELEASE := -g1
-LN_LIBS := `pkg-config --libs gtkmm-2.4`
+LN_LIBS := `pkg-config --libs gtkmm-2.4` -lpthread
 
 all: compile
 
