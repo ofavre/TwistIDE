@@ -50,8 +50,6 @@ void* VimSocketInterfaceCommunicator::readloop(void* pthat)
 
 void VimSocketInterfaceCommunicator::readloop()
 {
-    std::cout << "Inside readloop" << std::endl;
-
     std::stringstream line;
     char buffer[1051];
     memset(buffer, 0, sizeof(buffer));
@@ -72,31 +70,34 @@ void VimSocketInterfaceCommunicator::readloop()
             break;
         }
         buffer[n] = '\0';
-        printf("Here is the message (%d): %s\n", n, buffer);
-        //TODO: Analyze answers and events
+        // Analyze answers and events
         char* start = buffer;
         char* nl = strchr(start, '\n');
         for ( ; nl != NULL ; nl = strchr(start, '\n'))
         {
             *nl ='\0';
-            std::cout << "Adding \"" << start << "\"" << std::endl;
             line << start;
             analyze_answer(line);
+            // Reset line as an empty buffer
+            line.rdbuf()->str("");
+            line.seekg(0);
+            line.seekp(0);
             line.clear(); // clear eof()
+            // Next line
             start = nl+1;
         };
-        std::cout << "Adding unfinished \"" << start << "\"" << std::endl;
+        if (start[0] != '\0')
+            std::cout << "Adding unfinished \"" << start << "\"" << std::endl;
         line << start;
     }
 
-    std::cout << "Exitting readloop" << std::endl;
     close(); // safe to call twice
     return;
 }
 
 void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
 {
-    std::cout << "Analyzing : \"" << line.str() << "\"" << std::endl;
+    std::cout << "Analyzing \"" << line.str() << "\"" << std::endl;
     // Read first number: seqno or bufID
     char c;
     long n = 0;
@@ -117,15 +118,14 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
     if (c == ' ')
     {
         seqno = n;
-        std::cout << "seqno = " << seqno << std::endl;
         // Following are space separated words for return values
         //TODO: Have some model to emit an answer to the right function call
         //      Based on seqno.
+        std::cout << "TODO: Analyze answer according to the matching function call!" << std::endl;
     }
     else if (c == ':')
     {
         bufID = n;
-        std::cout << "bufID = " << bufID << std::endl;
         std::string evtName;
         while (line.good())
         {
@@ -139,13 +139,11 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
                 evtName.push_back(c);
             }
         }
-        std::cout << "Event = " << evtName << std::endl;
         line >> seqno;
-        std::cout << "seqno = " << seqno << std::endl;
         // Following are space separated words for parameters values
         if (mEventManager == NULL)
         {
-            std::cout << "End of the adventure, no VimEventManager set." << std::endl;
+            std::cout << "No VimEventManager set, ignoring event." << std::endl;
         }
         else
         {
@@ -156,7 +154,6 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
             }
             else
             {
-                std::cout << "Found event : " << evt->getName() << std::endl;
                 const std::vector<VimValue::Type>& paramTypes = evt->getParameterTypes();
                 std::vector<VimValue> params;
                 params.reserve(paramTypes.size());
@@ -170,7 +167,6 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
                     // Parse next parameter
                     VimValue param = VimValue::parse(*type, line);
                     params.push_back(param);
-                    std::cout << "Param : " << VimValue::TypeToString(param.getType()) << " = \"" << param.toString() << "\"" << std::endl;
                 }
                 // Emit the event
                 evt->emit(*this, bufID, seqno, params);
@@ -189,7 +185,7 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
             std::cout << "Password : \"" << w << "\"" << std::endl;
             if (mEventManager == NULL)
             {
-                std::cout << "End of the adventure, no VimEventManager set." << std::endl;
+                std::cout << "No VimEventManager set, ignoring special command." << std::endl;
             }
             else
             {
@@ -292,6 +288,7 @@ void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::s
     buff << bufID << ":" << command << "!" << seqno;
     for (std::vector<VimValue>::const_iterator it = parameters.begin() ; it < parameters.end() ; it++)
         buff << " " << it->toString();
+    std::cout << "Sending command \"" << buff.str() << "\"" << std::endl;
     buff << std::endl;
     send(mSocket, buff.str().c_str(), buff.str().length(), 0);
 }
@@ -300,6 +297,7 @@ void VimSocketInterfaceCommunicator::close()
 {
     if (mSocket != -1)
     {
+        std::cout << "Closing client socket" << std::endl;
         ::close(mSocket);
         mSocket = -1;
     }

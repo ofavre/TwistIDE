@@ -116,6 +116,8 @@ bool VimSocketInterfaceServer::accept_loop_async()
 
 void VimSocketInterfaceServer::close()
 {
+    if (mSocket == -1) return;
+    std::cout << "Closing server" << std::endl;
     ::close(mSocket);
     mSocket = -1;
     mListening = false;
