@@ -218,6 +218,84 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
     }
 }
 
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command)
+{
+    send_command(bufID, seqno, command, std::vector<VimValue>());
+}
+
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command, VimValue param1)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(1);
+    parameters.push_back(param1);
+    send_command(bufID, seqno, command, parameters);
+}
+
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command, VimValue param1, VimValue param2)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(2);
+    parameters.push_back(param1);
+    parameters.push_back(param2);
+    send_command(bufID, seqno, command, parameters);
+}
+
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command, VimValue param1, VimValue param2, VimValue param3)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(3);
+    parameters.push_back(param1);
+    parameters.push_back(param2);
+    parameters.push_back(param3);
+    send_command(bufID, seqno, command, parameters);
+}
+
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command, VimValue param1, VimValue param2, VimValue param3, VimValue param4)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(4);
+    parameters.push_back(param1);
+    parameters.push_back(param2);
+    parameters.push_back(param3);
+    parameters.push_back(param4);
+    send_command(bufID, seqno, command, parameters);
+}
+
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command, VimValue param1, VimValue param2, VimValue param3, VimValue param4, VimValue param5)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(5);
+    parameters.push_back(param1);
+    parameters.push_back(param2);
+    parameters.push_back(param3);
+    parameters.push_back(param4);
+    parameters.push_back(param5);
+    send_command(bufID, seqno, command, parameters);
+}
+
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command, VimValue param1, VimValue param2, VimValue param3, VimValue param4, VimValue param5, VimValue param6)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(6);
+    parameters.push_back(param1);
+    parameters.push_back(param2);
+    parameters.push_back(param3);
+    parameters.push_back(param4);
+    parameters.push_back(param5);
+    parameters.push_back(param6);
+    send_command(bufID, seqno, command, parameters);
+}
+
+void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::string command, const std::vector<VimValue>& parameters)
+{
+    std::stringstream buff;
+    buff << bufID << ":" << command << "!" << seqno;
+    for (std::vector<VimValue>::const_iterator it = parameters.begin() ; it < parameters.end() ; it++)
+        buff << " " << it->toString();
+    buff << std::endl;
+    send(mSocket, buff.str().c_str(), buff.str().length(), 0);
+}
+
 void VimSocketInterfaceCommunicator::close()
 {
     if (mSocket != -1)

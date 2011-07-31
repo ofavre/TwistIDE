@@ -113,6 +113,7 @@ std::string VimValue::toString() const
     {
         case STRING:
         case PATHNAME:
+            return "\"" + mString + "\"";
         case COLOR:
             return mString;
         case NUMBER:

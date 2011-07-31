@@ -24,6 +24,12 @@
 #include "vim_events/unmodified.hpp"
 #include "vim_events/version.hpp"
 
+#include "VimCommand.hpp"
+#include "vim_commands/create.hpp"
+#include "vim_commands/startDocumentListen.hpp"
+#include "vim_commands/setTitle.hpp"
+#include "vim_commands/setFullName.hpp"
+
 
 
 GVim::GVim()
@@ -170,7 +176,10 @@ void GVim::on_vimclient_save(VimSocketInterfaceCommunicator& vim, long bufID, lo
 void GVim::on_vimclient_startupDone(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
 {
     std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::startupDone()" << std::endl;
-    //TODO: call 1:create!1
+    VimCommandCreate::send(vim, 1, ++seqno);
+    VimCommandStartDocumentListen::send(vim, 1, ++seqno);
+    VimCommandSetTitle::send(vim, 1, ++seqno, "Some title");
+    VimCommandSetFullName::send(vim, 1, ++seqno, "~/some-full-name.txt");
 }
 
 void GVim::on_vimclient_unmodified(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
