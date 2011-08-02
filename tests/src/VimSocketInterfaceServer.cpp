@@ -39,10 +39,15 @@ bool VimSocketInterfaceServer::bind()
     mSckaddr.sin_family = AF_INET;
     mSckaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
     mSckaddr.sin_port = htons((unsigned short)mPort);
-    if (::bind(mSocket, (struct sockaddr *)&mSckaddr, sizeof(mSckaddr)) == -1)
+    socklen_t addrLen = sizeof(mSckaddr);
+    if (::bind(mSocket, (sockaddr *)&mSckaddr, addrLen) == -1)
     {
         perror("bind() error");
         return false;
+    }
+    if (getsockname(mSocket, (sockaddr*)&mSckaddr, &addrLen) == -1)
+    {
+        perror("getsockname() error");
     }
     return true;
 }
@@ -104,6 +109,7 @@ bool VimSocketInterfaceServer::accept_loop_async()
     pthread_t thread;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     if (pthread_create(&thread, &attr, &VimSocketInterfaceServer::accept_loop, reinterpret_cast<void*>(this)) != 0)
     {
         perror("Cannot start accept thread");

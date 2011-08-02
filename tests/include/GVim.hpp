@@ -29,7 +29,7 @@ class GVim : public Gtk::Window
 
         void setupSignals();
 
-        void startServer();
+        bool startServer();
 
         void on_vimsocket_newclient(VimSocketInterfaceCommunicator* conn);
 
@@ -67,9 +67,11 @@ class GVim : public Gtk::Window
 
         void on_vimclient_version(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string version);
 
-        void makeGVim();
+        void spawnGVim();
 
         void on_mSocket_realize();
+
+        void on_map_quit();
 
         void on_mSocket_plug_added();
 

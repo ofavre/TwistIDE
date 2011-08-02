@@ -32,17 +32,18 @@ void VimSocketInterfaceCommunicator::readloop_async()
     pthread_t thread;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     if (pthread_create(&thread, &attr, &VimSocketInterfaceCommunicator::readloop, reinterpret_cast<void*>(this)) != 0)
     {
         perror("Cannot start client socket reading thread");
         throw std::runtime_error("pthread_create() failed");
     }
-    std::cout << "Client socket reading thread started" << std::endl;
     pthread_attr_destroy(&attr);
 }
 
 void* VimSocketInterfaceCommunicator::readloop(void* pthat)
 {
+    std::cout << "Client socket reading thread started" << std::endl;
     reinterpret_cast<VimSocketInterfaceCommunicator*>(pthat)->readloop();
     std::cout << "Client socket reading thread finished" << std::endl;
     return NULL;
@@ -64,9 +65,6 @@ void VimSocketInterfaceCommunicator::readloop()
         else if (n == 0)
         {
             std::cout << "Nothing more to read, exitting." << std::endl;
-            if (mSocket != -1)
-                ::close(mSocket);
-            mSocket = -1;
             break;
         }
         buffer[n] = '\0';
@@ -295,11 +293,9 @@ void VimSocketInterfaceCommunicator::send_command(long bufID, long seqno, std::s
 
 void VimSocketInterfaceCommunicator::close()
 {
-    if (mSocket != -1)
-    {
-        std::cout << "Closing client socket" << std::endl;
-        ::close(mSocket);
-        mSocket = -1;
-    }
+    if (mSocket == -1) return;
+    std::cout << "Closing client socket" << std::endl;
+    ::close(mSocket);
+    mSocket = -1;
 }
 
