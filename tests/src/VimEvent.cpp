@@ -24,7 +24,7 @@ VimEvent::VimEvent(const std::string& name, int paramCount, VimValue::Type param
     va_end(args);
 }
 
-void VimEvent::emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, const std::vector<VimValue>& parameters)
+void VimEvent::emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
 {
     if (parameters.size() != mParameterTypes.size())
         throw std::invalid_argument("Bad parameter count");
@@ -35,6 +35,6 @@ void VimEvent::emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno,
         if (values->getType() != *types)
             throw std::invalid_argument("Bad parameter type");
     }
-    do_emit(vim, bufID, seqno, parameters);
+    do_emit(vim, bufID, parameters);
 }
 

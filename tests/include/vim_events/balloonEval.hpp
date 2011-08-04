@@ -22,9 +22,9 @@ class VimEventBalloonEval : public VimEvent
             return "balloonEval";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, const std::vector<VimValue>& parameters)
+        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
-            mSignal.emit(vim, bufID, seqno, parameters[0].getOffset(), parameters[1].getNumber(), parameters[2].getString());
+            mSignal.emit(vim, bufID, parameters[0].getOffset(), parameters[1].getNumber(), parameters[2].getString());
         }
 
         inline sigc::signal_base get_signalbase()
@@ -32,13 +32,13 @@ class VimEventBalloonEval : public VimEvent
             return mSignal;
         }
 
-        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long,std::string> get_signal()
+        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,std::string> get_signal()
         {
             return mSignal;
         }
 
     private:
-        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long,std::string>  mSignal;
+        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,std::string>  mSignal;
 };
 
 

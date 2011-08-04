@@ -146,90 +146,90 @@ void GVim::on_vimclient_special_auth(VimSocketInterfaceCommunicator& vim, std::s
     std::cout << "Vim authenticating with password \"" << password << "\"" << std::endl;
 }
 
-void GVim::on_vimclient_balloonEval(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset, long len, std::string type)
+void GVim::on_vimclient_balloonEval(VimSocketInterfaceCommunicator& vim, long bufID, long offset, long len, std::string type)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::balloonEval(offset="<<offset<<", len="<<len<<", type="<<type<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::balloonEval(offset="<<offset<<", len="<<len<<", type="<<type<<")" << std::endl;
 }
 
-void GVim::on_vimclient_balloonText(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string text)
+void GVim::on_vimclient_balloonText(VimSocketInterfaceCommunicator& vim, long bufID, std::string text)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::balloonText(text="<<text<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::balloonText(text="<<text<<")" << std::endl;
 }
 
-void GVim::on_vimclient_buttonRelease(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long button, long line, long col)
+void GVim::on_vimclient_buttonRelease(VimSocketInterfaceCommunicator& vim, long bufID, long button, long line, long col)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::buttonRelease(button="<<button<<", line="<<line<<", col="<<col<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::buttonRelease(button="<<button<<", line="<<line<<", col="<<col<<")" << std::endl;
 }
 
-void GVim::on_vimclient_disconnect(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+void GVim::on_vimclient_disconnect(VimSocketInterfaceCommunicator& vim, long bufID)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::disconnect()" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::disconnect()" << std::endl;
     std::cout << "Vim is disconnecting!" << std::endl;
     // VimSocketInterfaceCommunicator takes care of its own shutdown properly
 }
 
-void GVim::on_vimclient_fileOpened(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string pathname, bool open, bool modified)
+void GVim::on_vimclient_fileOpened(VimSocketInterfaceCommunicator& vim, long bufID, std::string pathname, bool open, bool modified)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::fileOpened(pathname="<<pathname<<", open="<<open<<", modified="<<modified<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::fileOpened(pathname="<<pathname<<", open="<<open<<", modified="<<modified<<")" << std::endl;
 }
 
-void GVim::on_vimclient_geometry(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long cols, long rows, long x, long y)
+void GVim::on_vimclient_geometry(VimSocketInterfaceCommunicator& vim, long bufID, long cols, long rows, long x, long y)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::geometry(cols="<<cols<<", rows="<<rows<<", x="<<x<<", y="<<y<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::geometry(cols="<<cols<<", rows="<<rows<<", x="<<x<<", y="<<y<<")" << std::endl;
 }
 
-void GVim::on_vimclient_insert(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset, std::string text)
+void GVim::on_vimclient_insert(VimSocketInterfaceCommunicator& vim, long bufID, long offset, std::string text)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::insert(offset="<<offset<<", text="<<text<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::insert(offset="<<offset<<", text="<<text<<")" << std::endl;
 }
 
-void GVim::on_vimclient_keyCommand(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string keyName)
+void GVim::on_vimclient_keyCommand(VimSocketInterfaceCommunicator& vim, long bufID, std::string keyName)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::keyCommand(keyName="<<keyName<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::keyCommand(keyName="<<keyName<<")" << std::endl;
 }
 
-void GVim::on_vimclient_keyAtPos(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string keyName, long lnum, long lcol)
+void GVim::on_vimclient_keyAtPos(VimSocketInterfaceCommunicator& vim, long bufID, std::string keyName, long lnum, long lcol)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::keyAtPos(keyName="<<keyName<<", lnum="<<lnum<<", lcol="<<lcol<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::keyAtPos(keyName="<<keyName<<", lnum="<<lnum<<", lcol="<<lcol<<")" << std::endl;
 }
 
-void GVim::on_vimclient_killed(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+void GVim::on_vimclient_killed(VimSocketInterfaceCommunicator& vim, long bufID)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::killed()" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::killed()" << std::endl;
 }
 
-void GVim::on_vimclient_newDotAndMark(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset1, long offset2)
+void GVim::on_vimclient_newDotAndMark(VimSocketInterfaceCommunicator& vim, long bufID, long offset1, long offset2)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::newDotAndMark(offset1="<<offset1<<", offset2="<<offset2<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::newDotAndMark(offset1="<<offset1<<", offset2="<<offset2<<")" << std::endl;
 }
 
-void GVim::on_vimclient_remove(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset, long length)
+void GVim::on_vimclient_remove(VimSocketInterfaceCommunicator& vim, long bufID, long offset, long length)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::remove(offset="<<offset<<", length="<<length<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::remove(offset="<<offset<<", length="<<length<<")" << std::endl;
 }
 
-void GVim::on_vimclient_save(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+void GVim::on_vimclient_save(VimSocketInterfaceCommunicator& vim, long bufID)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::save()" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::save()" << std::endl;
 }
 
-void GVim::on_vimclient_startupDone(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+void GVim::on_vimclient_startupDone(VimSocketInterfaceCommunicator& vim, long bufID)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::startupDone()" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::startupDone()" << std::endl;
     VimCommandCreate::send(vim, 1);
     VimCommandStartDocumentListen::send(vim, 1);
     VimCommandSetTitle::send(vim, 1, "Some title");
     VimCommandSetFullName::send(vim, 1, "~/some-full-name.txt");
 }
 
-void GVim::on_vimclient_unmodified(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+void GVim::on_vimclient_unmodified(VimSocketInterfaceCommunicator& vim, long bufID)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::unmodified()" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::unmodified()" << std::endl;
 }
 
-void GVim::on_vimclient_version(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string version)
+void GVim::on_vimclient_version(VimSocketInterfaceCommunicator& vim, long bufID, std::string version)
 {
-    std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::version(version="<<version<<")" << std::endl;
+    std::cout << "Vim(bufID="<<bufID<<")::version(version="<<version<<")" << std::endl;
 }
 
 void GVim::spawnGVim()

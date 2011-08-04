@@ -22,9 +22,9 @@ class VimEventKeyAtPos: public VimEvent
             return "keyAtPos";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, const std::vector<VimValue>& parameters)
+        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
-            mSignal.emit(vim, bufID, seqno, parameters[0].getString(), parameters[1].getLineNumber(), parameters[2].getColumnNumber());
+            mSignal.emit(vim, bufID, parameters[0].getString(), parameters[1].getLineNumber(), parameters[2].getColumnNumber());
         }
 
         inline sigc::signal_base get_signalbase()
@@ -32,13 +32,13 @@ class VimEventKeyAtPos: public VimEvent
             return mSignal;
         }
 
-        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,std::string,long,long> get_signal()
+        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,std::string,long,long> get_signal()
         {
             return mSignal;
         }
 
     private:
-        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,std::string,long,long>  mSignal;
+        sigc::signal<void,VimSocketInterfaceCommunicator&,long,std::string,long,long>  mSignal;
 };
 
 

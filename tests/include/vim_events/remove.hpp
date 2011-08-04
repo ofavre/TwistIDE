@@ -22,9 +22,9 @@ class VimEventRemove: public VimEvent
             return "remove";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, const std::vector<VimValue>& parameters)
+        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
-            mSignal.emit(vim, bufID, seqno, parameters[0].getOffset(), parameters[1].getNumber());
+            mSignal.emit(vim, bufID, parameters[0].getOffset(), parameters[1].getNumber());
         }
 
         inline sigc::signal_base get_signalbase()
@@ -32,13 +32,13 @@ class VimEventRemove: public VimEvent
             return mSignal;
         }
 
-        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long> get_signal()
+        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long> get_signal()
         {
             return mSignal;
         }
 
     private:
-        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long>  mSignal;
+        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long>  mSignal;
 };
 
 

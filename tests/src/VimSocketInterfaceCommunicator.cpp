@@ -168,7 +168,7 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
                     params.push_back(param);
                 }
                 // Emit the event
-                evt->emit(*this, bufID, seqno, params);
+                evt->emit(*this, bufID, params);
             }
         }
     }

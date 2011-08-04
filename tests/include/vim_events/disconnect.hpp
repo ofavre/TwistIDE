@@ -22,9 +22,9 @@ class VimEventDisconnect : public VimEvent
             return "disconnect";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, const std::vector<VimValue>& parameters)
+        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
-            mSignal.emit(vim, bufID, seqno);
+            mSignal.emit(vim, bufID);
         }
 
         inline sigc::signal_base get_signalbase()
@@ -32,13 +32,13 @@ class VimEventDisconnect : public VimEvent
             return mSignal;
         }
 
-        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long> get_signal()
+        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long> get_signal()
         {
             return mSignal;
         }
 
     private:
-        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long>    mSignal;
+        sigc::signal<void,VimSocketInterfaceCommunicator&,long>    mSignal;
 };
 
 

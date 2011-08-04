@@ -22,9 +22,9 @@ class VimEventFileOpened: public VimEvent
             return "fileOpened";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, const std::vector<VimValue>& parameters)
+        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
-            mSignal.emit(vim, bufID, seqno, parameters[0].getPathName(), parameters[1].getBoolean(), parameters[2].getBoolean());
+            mSignal.emit(vim, bufID, parameters[0].getPathName(), parameters[1].getBoolean(), parameters[2].getBoolean());
         }
 
         inline sigc::signal_base get_signalbase()
@@ -32,13 +32,13 @@ class VimEventFileOpened: public VimEvent
             return mSignal;
         }
 
-        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,std::string,bool,bool> get_signal()
+        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,std::string,bool,bool> get_signal()
         {
             return mSignal;
         }
 
     private:
-        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,std::string,bool,bool>  mSignal;
+        sigc::signal<void,VimSocketInterfaceCommunicator&,long,std::string,bool,bool>  mSignal;
 };
 
 

@@ -22,9 +22,9 @@ class VimEventGeometry: public VimEvent
             return "geometry";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, const std::vector<VimValue>& parameters)
+        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
-            mSignal.emit(vim, bufID, seqno, parameters[0].getColumnNumber(), parameters[1].getLineNumber(), parameters[2].getColumnNumber(), parameters[3].getLineNumber());
+            mSignal.emit(vim, bufID, parameters[0].getColumnNumber(), parameters[1].getLineNumber(), parameters[2].getColumnNumber(), parameters[3].getLineNumber());
         }
 
         inline sigc::signal_base get_signalbase()
@@ -32,13 +32,13 @@ class VimEventGeometry: public VimEvent
             return mSignal;
         }
 
-        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long,long,long> get_signal()
+        inline sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long,long> get_signal()
         {
             return mSignal;
         }
 
     private:
-        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long,long,long>  mSignal;
+        sigc::signal<void,VimSocketInterfaceCommunicator&,long,long,long,long,long>  mSignal;
 };
 
 

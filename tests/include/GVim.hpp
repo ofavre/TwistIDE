@@ -35,37 +35,37 @@ class GVim : public Gtk::Window
 
         void on_vimclient_special_auth(VimSocketInterfaceCommunicator& vim, std::string password);
 
-        void on_vimclient_balloonEval(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset, long len, std::string type);
+        void on_vimclient_balloonEval(VimSocketInterfaceCommunicator& vim, long bufID, long offset, long len, std::string type);
 
-        void on_vimclient_balloonText(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string text);
+        void on_vimclient_balloonText(VimSocketInterfaceCommunicator& vim, long bufID, std::string text);
 
-        void on_vimclient_buttonRelease(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long button, long line, long col);
+        void on_vimclient_buttonRelease(VimSocketInterfaceCommunicator& vim, long bufID, long button, long line, long col);
 
-        void on_vimclient_disconnect(VimSocketInterfaceCommunicator& vim, long bufID, long seqno);
+        void on_vimclient_disconnect(VimSocketInterfaceCommunicator& vim, long bufID);
 
-        void on_vimclient_fileOpened(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string pathname, bool open, bool modified);
+        void on_vimclient_fileOpened(VimSocketInterfaceCommunicator& vim, long bufID, std::string pathname, bool open, bool modified);
 
-        void on_vimclient_geometry(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long cols, long rows, long x, long y);
+        void on_vimclient_geometry(VimSocketInterfaceCommunicator& vim, long bufID, long cols, long rows, long x, long y);
 
-        void on_vimclient_insert(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset, std::string text);
+        void on_vimclient_insert(VimSocketInterfaceCommunicator& vim, long bufID, long offset, std::string text);
 
-        void on_vimclient_keyCommand(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string keyName);
+        void on_vimclient_keyCommand(VimSocketInterfaceCommunicator& vim, long bufID, std::string keyName);
 
-        void on_vimclient_keyAtPos(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string keyName, long lnum, long lcol);
+        void on_vimclient_keyAtPos(VimSocketInterfaceCommunicator& vim, long bufID, std::string keyName, long lnum, long lcol);
 
-        void on_vimclient_killed(VimSocketInterfaceCommunicator& vim, long bufID, long seqno);
+        void on_vimclient_killed(VimSocketInterfaceCommunicator& vim, long bufID);
 
-        void on_vimclient_newDotAndMark(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset1, long offset2);
+        void on_vimclient_newDotAndMark(VimSocketInterfaceCommunicator& vim, long bufID, long offset1, long offset2);
 
-        void on_vimclient_remove(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long offset, long length);
+        void on_vimclient_remove(VimSocketInterfaceCommunicator& vim, long bufID, long offset, long length);
 
-        void on_vimclient_save(VimSocketInterfaceCommunicator& vim, long bufID, long seqno);
+        void on_vimclient_save(VimSocketInterfaceCommunicator& vim, long bufID);
 
-        void on_vimclient_startupDone(VimSocketInterfaceCommunicator& vim, long bufID, long seqno);
+        void on_vimclient_startupDone(VimSocketInterfaceCommunicator& vim, long bufID);
 
-        void on_vimclient_unmodified(VimSocketInterfaceCommunicator& vim, long bufID, long seqno);
+        void on_vimclient_unmodified(VimSocketInterfaceCommunicator& vim, long bufID);
 
-        void on_vimclient_version(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string version);
+        void on_vimclient_version(VimSocketInterfaceCommunicator& vim, long bufID, std::string version);
 
         void spawnGVim();
 
