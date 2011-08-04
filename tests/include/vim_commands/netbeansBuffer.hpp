@@ -16,9 +16,9 @@ class VimCommandNetbeansBuffer : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, bool isNetbeansBuffer)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, bool isNetbeansBuffer)
         {
-            vim.send_command(bufID, seqno, "netbeansBuffer", VimValue::newBoolean(isNetbeansBuffer));
+            vim.send_command(bufID, "netbeansBuffer", VimValue::newBoolean(isNetbeansBuffer));
         }
 };
 

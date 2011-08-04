@@ -16,9 +16,9 @@ class VimCommandEndAtomic : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID)
         {
-            vim.send_command(bufID, seqno, "endAtomic");
+            vim.send_command(bufID, "endAtomic");
         }
 };
 

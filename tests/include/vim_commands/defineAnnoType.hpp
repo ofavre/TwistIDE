@@ -16,9 +16,9 @@ class VimCommandDefineAnnoType : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long typeNum, std::string typeName, std::string tooltip, std::string glyphFile, std::string fg, std::string bg)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long typeNum, std::string typeName, std::string tooltip, std::string glyphFile, std::string fg, std::string bg)
         {
-            vim.send_command(bufID, seqno, "defineAnnoType", VimValue::newNumber(typeNum), VimValue::newString(typeName), VimValue::newString(tooltip), VimValue::newString(glyphFile), VimValue::newColor(fg), VimValue::newColor(bg));
+            vim.send_command(bufID, "defineAnnoType", VimValue::newNumber(typeNum), VimValue::newString(typeName), VimValue::newString(tooltip), VimValue::newString(glyphFile), VimValue::newColor(fg), VimValue::newColor(bg));
         }
 };
 

@@ -16,9 +16,9 @@ class VimCommandCreate : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID)
         {
-            vim.send_command(bufID, seqno, "create");
+            vim.send_command(bufID, "create");
         }
 };
 

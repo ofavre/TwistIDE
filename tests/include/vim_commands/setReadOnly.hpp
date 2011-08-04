@@ -16,9 +16,9 @@ class VimCommandSetReadOnly : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID)
         {
-            vim.send_command(bufID, seqno, "setReadOnly");
+            vim.send_command(bufID, "setReadOnly");
         }
 };
 

@@ -16,9 +16,9 @@ private:
     }
     
 public:
-    inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string text)
+    inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, std::string text)
     {
-        vim.send_command(bufID, seqno, "showBalloon", VimValue::newString(text));
+        vim.send_command(bufID, "showBalloon", VimValue::newString(text));
     }
 };
 

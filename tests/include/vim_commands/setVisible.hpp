@@ -16,9 +16,9 @@ class VimCommandSetVisible : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, bool visible)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, bool visible)
         {
-            vim.send_command(bufID, seqno, "setVisible", VimValue::newBoolean(visible));
+            vim.send_command(bufID, "setVisible", VimValue::newBoolean(visible));
         }
 };
 

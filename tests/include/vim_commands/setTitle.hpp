@@ -16,9 +16,9 @@ class VimCommandSetTitle : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string name)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, std::string name)
         {
-            vim.send_command(bufID, seqno, "setTitle", VimValue::newString(name));
+            vim.send_command(bufID, "setTitle", VimValue::newString(name));
         }
 };
 

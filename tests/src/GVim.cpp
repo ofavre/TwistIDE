@@ -216,10 +216,10 @@ void GVim::on_vimclient_save(VimSocketInterfaceCommunicator& vim, long bufID, lo
 void GVim::on_vimclient_startupDone(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)
 {
     std::cout << "Vim(bufID="<<bufID<<",seqno="<<seqno<<")::startupDone()" << std::endl;
-    VimCommandCreate::send(vim, 1, ++seqno);
-    VimCommandStartDocumentListen::send(vim, 1, ++seqno);
-    VimCommandSetTitle::send(vim, 1, ++seqno, "Some title");
-    VimCommandSetFullName::send(vim, 1, ++seqno, "~/some-full-name.txt");
+    VimCommandCreate::send(vim, 1);
+    VimCommandStartDocumentListen::send(vim, 1);
+    VimCommandSetTitle::send(vim, 1, "Some title");
+    VimCommandSetFullName::send(vim, 1, "~/some-full-name.txt");
 }
 
 void GVim::on_vimclient_unmodified(VimSocketInterfaceCommunicator& vim, long bufID, long seqno)

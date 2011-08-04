@@ -16,9 +16,9 @@ class VimCommandRemoveAnno : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long serNum)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long serNum)
         {
-            vim.send_command(bufID, seqno, "removeAnno", VimValue::newNumber(serNum));
+            vim.send_command(bufID, "removeAnno", VimValue::newNumber(serNum));
         }
 };
 

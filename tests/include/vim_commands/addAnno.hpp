@@ -16,9 +16,9 @@ class VimCommandAddAnno : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long serNum, long typeNum, long off, long len)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long serNum, long typeNum, long off, long len)
         {
-            vim.send_command(bufID, seqno, "addAnno", VimValue::newNumber(serNum), VimValue::newNumber(typeNum), VimValue::newOffset(off), VimValue::newNumber(len));
+            vim.send_command(bufID, "addAnno", VimValue::newNumber(serNum), VimValue::newNumber(typeNum), VimValue::newOffset(off), VimValue::newNumber(len));
         }
 };
 

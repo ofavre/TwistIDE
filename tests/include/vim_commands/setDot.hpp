@@ -16,9 +16,9 @@ class VimCommandSetDot : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long off)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long off)
         {
-            vim.send_command(bufID, seqno, "setDot", VimValue::newOffset(off));
+            vim.send_command(bufID, "setDot", VimValue::newOffset(off));
         }
 };
 

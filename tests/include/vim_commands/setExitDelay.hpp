@@ -16,9 +16,9 @@ class VimCommandSetExitDelay : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long seconds)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seconds)
         {
-            vim.send_command(bufID, seqno, "setExitDelay", VimValue::newNumber(seconds));
+            vim.send_command(bufID, "setExitDelay", VimValue::newNumber(seconds));
         }
 };
 

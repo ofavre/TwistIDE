@@ -16,9 +16,9 @@ class VimCommandSetModified : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, bool modified)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, bool modified)
         {
-            vim.send_command(bufID, seqno, "setModified", VimValue::newBoolean(modified));
+            vim.send_command(bufID, "setModified", VimValue::newBoolean(modified));
         }
 };
 

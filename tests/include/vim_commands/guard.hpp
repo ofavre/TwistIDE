@@ -16,9 +16,9 @@ class VimCommandGuard : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long off, long len)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long off, long len)
         {
-            vim.send_command(bufID, seqno, "guard", VimValue::newOffset(off), VimValue::newNumber(len));
+            vim.send_command(bufID, "guard", VimValue::newOffset(off), VimValue::newNumber(len));
         }
 };
 

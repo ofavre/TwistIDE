@@ -16,9 +16,9 @@ class VimCommandEditFile : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, std::string pathName)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, std::string pathName)
         {
-            vim.send_command(bufID, seqno, "editFile", VimValue::newPathName(pathName));
+            vim.send_command(bufID, "editFile", VimValue::newPathName(pathName));
         }
 };
 

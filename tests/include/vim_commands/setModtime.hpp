@@ -16,9 +16,9 @@ class VimCommandSetModtime : public VimCommand
         }
 
     public:
-        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long seqno, long time)
+        inline static void send(VimSocketInterfaceCommunicator& vim, long bufID, long time)
         {
-            vim.send_command(bufID, seqno, "setModtime", VimValue::newNumber(time));
+            vim.send_command(bufID, "setModtime", VimValue::newNumber(time));
         }
 };
 
