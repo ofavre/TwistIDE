@@ -22,7 +22,7 @@ class VimEventFileOpened: public VimEvent
             return "fileOpened";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
+        inline void emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
             mSignal.emit(vim, bufID, parameters[0].getPathName(), parameters[1].getBoolean(), parameters[2].getBoolean());
         }

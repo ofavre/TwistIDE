@@ -22,7 +22,7 @@ class VimEventKeyCommand: public VimEvent
             return "keyCommand";
         }
 
-        void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
+        void emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
             mSignal.emit(vim, bufID, parameters[0].getString());
         }

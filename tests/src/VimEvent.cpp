@@ -24,17 +24,3 @@ VimEvent::VimEvent(const std::string& name, int paramCount, VimValue::Type param
     va_end(args);
 }
 
-void VimEvent::emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
-{
-    if (parameters.size() != mParameterTypes.size())
-        throw std::invalid_argument("Bad parameter count");
-    std::vector<VimValue::Type>::iterator types = mParameterTypes.begin();
-    std::vector<VimValue>::const_iterator values = parameters.begin();
-    for (int i = mParameterTypes.size() ; i > 0 ; i--, types++, values++)
-    {
-        if (values->getType() != *types)
-            throw std::invalid_argument("Bad parameter type");
-    }
-    do_emit(vim, bufID, parameters);
-}
-

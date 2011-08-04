@@ -22,7 +22,7 @@ class VimEventButtonRelease : public VimEvent
             return "buttonRelease";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
+        inline void emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
             mSignal.emit(vim, bufID, parameters[0].getNumber(), parameters[1].getLineNumber(), parameters[2].getColumnNumber());
         }

@@ -22,7 +22,7 @@ class VimEventBalloonText : public VimEvent
             return "balloonText";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
+        inline void emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
             mSignal.emit(vim, bufID, parameters[0].getString());
         }

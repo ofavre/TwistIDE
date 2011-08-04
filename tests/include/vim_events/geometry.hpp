@@ -22,7 +22,7 @@ class VimEventGeometry: public VimEvent
             return "geometry";
         }
 
-        inline void do_emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
+        inline void emit(VimSocketInterfaceCommunicator& vim, long bufID, const std::vector<VimValue>& parameters)
         {
             mSignal.emit(vim, bufID, parameters[0].getColumnNumber(), parameters[1].getLineNumber(), parameters[2].getColumnNumber(), parameters[3].getLineNumber());
         }
