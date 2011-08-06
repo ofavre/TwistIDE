@@ -3,6 +3,7 @@
 
 
 #include <stdexcept>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 
@@ -102,9 +103,9 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
     long n = 0;
     long bufID = -1;
     long seqno = -1;
-    while (line.good())
+    line.get(c);
+    while (line.good()) // tells if last command succeeded, not if there is still further input
     {
-        line.get(c);
         if (c >= '0' && c <= '9')
         {
             n = n*10 + c-'0';
@@ -113,14 +114,49 @@ void VimSocketInterfaceCommunicator::analyze_answer(std::stringstream& line)
         {
             break;
         }
+        line.get(c);
     }
-    if (c == ' ')
+    if (c == ' ' || line.eof())
     {
         seqno = n;
-        // Following are space separated words for return values
-        //TODO: Have some model to emit an answer to the right function call
-        //      Based on seqno.
-        std::cout << "TODO: Analyze answer according to the matching function call!" << std::endl;
+        std::map<long,VimFunction*>::iterator it = mWaitingFunctionCalls.find(seqno);
+        if (it == mWaitingFunctionCalls.end())
+        {
+            std::cerr << "Function reply for non registered call (seqno=" << seqno << ")" << std::endl;
+        }
+        else
+        {
+            VimFunction* call = it->second;
+            mWaitingFunctionCalls.erase(it);
+            bool error = false;
+            if (line.good())
+            {
+               line.get(c);
+               if (c == '!')
+                  error = true;
+               else
+                   line.unget();
+            }
+            if (error)
+            {
+                std::string msg;
+                getline(line, msg);
+                call->error_callback(*this, call->getBufID(), msg);
+            }
+            else
+            {
+                std::vector<VimValue> params;
+                if (!call->parseReply(line, params))
+                {
+                    std::cerr << "Function reply parsing failed!" << std::endl;
+                }
+                else
+                {
+                    call->callback(*this, call->getBufID(), params);
+                }
+            }
+            delete call;
+        }
     }
     else if (c == ':')
     {
@@ -290,6 +326,42 @@ void VimSocketInterfaceCommunicator::send_command(long bufID, std::string comman
     std::cout << "Sending command \"" << buff.str() << "\"" << std::endl;
     buff << std::endl;
     send(mSocket, buff.str().c_str(), buff.str().length(), 0);
+}
+
+void VimSocketInterfaceCommunicator::call_function(long bufID, VimFunction* functionCall)
+{
+    std::vector<VimValue> parameters;
+    call_function(bufID, functionCall, parameters);
+}
+
+void VimSocketInterfaceCommunicator::call_function(long bufID, VimFunction* functionCall, VimValue param1)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(1);
+    parameters.push_back(param1);
+    call_function(bufID, functionCall, parameters);
+}
+
+void VimSocketInterfaceCommunicator::call_function(long bufID, VimFunction* functionCall, VimValue param1, VimValue param2)
+{
+    std::vector<VimValue> parameters;
+    parameters.reserve(2);
+    parameters.push_back(param1);
+    parameters.push_back(param2);
+    call_function(bufID, functionCall, parameters);
+}
+
+void VimSocketInterfaceCommunicator::call_function(long bufID, VimFunction* functionCall, const std::vector<VimValue>& parameters)
+{
+    long seqno = getNextSeqno();
+    std::stringstream buff;
+    buff << bufID << ":" << functionCall->getName() << "/" << seqno;
+    for (std::vector<VimValue>::const_iterator it = parameters.begin() ; it < parameters.end() ; it++)
+        buff << " " << it->toString();
+    std::cout << "Calling function \"" << buff.str() << "\"" << std::endl;
+    buff << std::endl;
+    send(mSocket, buff.str().c_str(), buff.str().length(), 0);
+    mWaitingFunctionCalls[seqno] = functionCall;
 }
 
 long VimSocketInterfaceCommunicator::getNextSeqno()

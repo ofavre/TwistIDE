@@ -67,6 +67,22 @@ class GVim : public Gtk::Window
 
         void on_vimclient_version(VimSocketInterfaceCommunicator& vim, long bufID, std::string version);
 
+        void on_vimclient_getCursor_reply(VimSocketInterfaceCommunicator& vim, long bufID, long cursorBufID, long lnum, long col, long off);
+
+        void on_vimclient_getLength_reply(VimSocketInterfaceCommunicator& vim, long bufID, long len);
+
+        void on_vimclient_getAnno_reply(VimSocketInterfaceCommunicator& vim, long bufID, long lnum);
+
+        void on_vimclient_getModified_reply(VimSocketInterfaceCommunicator& vim, long bufID, long count);
+
+        void on_vimclient_getText_reply(VimSocketInterfaceCommunicator& vim, long bufID, std::string text);
+
+        void on_vimclient_insert_reply(VimSocketInterfaceCommunicator& vim, long bufID, bool success);
+
+        void on_vimclient_remove_reply(VimSocketInterfaceCommunicator& vim, long bufID, bool success);
+
+        void on_vimclient_saveAndExit_reply(VimSocketInterfaceCommunicator& vim, long bufID, long modifiedBuffers);
+
         void spawnGVim();
 
         void on_mSocket_realize();

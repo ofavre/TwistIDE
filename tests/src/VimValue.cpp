@@ -7,6 +7,11 @@
 
 
 
+VimValue::VimValue()
+:   mType(INVALID)
+{
+}
+
 VimValue::VimValue(Type type, std::string str)
 {
     if (type != STRING && type != PATHNAME && type != COLOR)

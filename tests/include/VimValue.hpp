@@ -15,6 +15,7 @@ class VimValue
     public:
         enum Type
         {
+            INVALID         = 0,
             STRING          = 1,
             NUMBER          = 2,
             BOOLEAN         = 3,
@@ -51,6 +52,7 @@ class VimValue
         }
 
     public:
+        VimValue();
         VimValue(Type type, std::string str);
         VimValue(Type type, long nbr);
         VimValue(Type type, bool bol);

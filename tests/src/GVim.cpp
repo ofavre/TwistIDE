@@ -7,6 +7,7 @@
 
 
 
+#include "VimEvent.hpp"
 #include "vim_events/balloonEval.hpp"
 #include "vim_events/balloonText.hpp"
 #include "vim_events/buttonRelease.hpp"
@@ -29,6 +30,16 @@
 #include "vim_commands/startDocumentListen.hpp"
 #include "vim_commands/setTitle.hpp"
 #include "vim_commands/setFullName.hpp"
+
+#include "VimFunction.hpp"
+#include "vim_functions/getCursor.hpp"
+#include "vim_functions/getLength.hpp"
+#include "vim_functions/getAnno.hpp"
+#include "vim_functions/getModified.hpp"
+#include "vim_functions/getText.hpp"
+#include "vim_functions/insert.hpp"
+#include "vim_functions/remove.hpp"
+#include "vim_functions/saveAndExit.hpp"
 
 
 
@@ -181,6 +192,8 @@ void GVim::on_vimclient_geometry(VimSocketInterfaceCommunicator& vim, long bufID
 void GVim::on_vimclient_insert(VimSocketInterfaceCommunicator& vim, long bufID, long offset, std::string text)
 {
     std::cout << "Vim(bufID="<<bufID<<")::insert(offset="<<offset<<", text="<<text<<")" << std::endl;
+    VimFunctionGetCursor::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_getCursor_reply));
+    VimFunctionGetLength::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_getLength_reply));
 }
 
 void GVim::on_vimclient_keyCommand(VimSocketInterfaceCommunicator& vim, long bufID, std::string keyName)
@@ -230,6 +243,77 @@ void GVim::on_vimclient_unmodified(VimSocketInterfaceCommunicator& vim, long buf
 void GVim::on_vimclient_version(VimSocketInterfaceCommunicator& vim, long bufID, std::string version)
 {
     std::cout << "Vim(bufID="<<bufID<<")::version(version="<<version<<")" << std::endl;
+}
+
+void GVim::on_vimclient_getCursor_reply(VimSocketInterfaceCommunicator& vim, long bufID, long cursorBufID, long lnum, long col, long off)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::getCursor() -> cursorBufID="<<cursorBufID<<", lnum="<<lnum<<", col="<<col<<", off="<<off << std::endl;
+}
+
+void GVim::on_vimclient_getLength_reply(VimSocketInterfaceCommunicator& vim, long bufID, long len)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::getLength() -> len="<<len << std::endl;
+    // Disabled tests (impacts normal typing behaviour)
+    /*
+    if (len == 10)
+    {
+        std::cout << "Getting unexisting annotation line" << std::endl;
+        VimFunctionGetAnno::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_getAnno_reply), 1);
+    }
+    else if (len == 20)
+    {
+        std::cout << "Getting modified buffers" << std::endl;
+        VimFunctionGetModified::call(vim, 0, sigc::mem_fun(*this, &GVim::on_vimclient_getModified_reply));
+        std::cout << "Getting is buffer modified" << std::endl;
+        VimFunctionGetModified::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_getModified_reply));
+    }
+    else if (len == 30)
+    {
+        VimFunctionGetText::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_getText_reply));
+    }
+    else if (len == 5)
+    {
+        VimFunctionInsert::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_insert_reply), len-1, "ok");
+    }
+    else if (len == 40)
+    {
+        VimFunctionRemove::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_remove_reply), -10, 80);
+    }
+    else if (len == 50)
+    {
+        VimFunctionSaveAndExit::call(vim, bufID, sigc::mem_fun(*this, &GVim::on_vimclient_saveAndExit_reply));
+    }
+    */
+}
+
+void GVim::on_vimclient_getAnno_reply(VimSocketInterfaceCommunicator& vim, long bufID, long lnum)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::getAnno() -> lnum="<<lnum << std::endl;
+}
+
+void GVim::on_vimclient_getModified_reply(VimSocketInterfaceCommunicator& vim, long bufID, long count)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::getModified() -> count="<<count << std::endl;
+}
+
+void GVim::on_vimclient_getText_reply(VimSocketInterfaceCommunicator& vim, long bufID, std::string text)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::getText() -> text=\""<<text<<"\"" << std::endl;
+}
+
+void GVim::on_vimclient_insert_reply(VimSocketInterfaceCommunicator& vim, long bufID, bool success)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::insert() -> success="<<success << std::endl;
+}
+
+void GVim::on_vimclient_remove_reply(VimSocketInterfaceCommunicator& vim, long bufID, bool success)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::remove() -> success="<<success << std::endl;
+}
+
+void GVim::on_vimclient_saveAndExit_reply(VimSocketInterfaceCommunicator& vim, long bufID, long modifiedBuffers)
+{
+    std::cout << "Vim(bufID="<<bufID<<")::remove() -> modifiedBuffers="<<modifiedBuffers << std::endl;
 }
 
 void GVim::spawnGVim()

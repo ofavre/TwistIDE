@@ -17,6 +17,7 @@ class VimSocketInterfaceCommunicator;
 
 
 #include "VimEventManager.hpp"
+#include "VimFunction.hpp"
 
 
 
@@ -48,18 +49,27 @@ class VimSocketInterfaceCommunicator
 
         void send_command(long bufID, std::string command, const std::vector<VimValue>& parameters);
 
+        void call_function(long bufID, VimFunction* functionCall);
+
+        void call_function(long bufID, VimFunction* functionCall, VimValue param1);
+        void call_function(long bufID, VimFunction* functionCall, VimValue param1, VimValue param2);
+
+        void call_function(long bufID, VimFunction* functionCall, const std::vector<VimValue>& parameters);
+
         void close();
 
     protected:
         long getNextSeqno();
 
     private:
-        int                 mSocket;
-        sockaddr_in         mSckaddr;
-        VimEventManager*    mEventManager;
+        int                         mSocket;
+        sockaddr_in                 mSckaddr;
+        VimEventManager*            mEventManager;
 
-        Glib::Mutex         mSeqnoLock;
-        long                mSeqno;
+        Glib::Mutex                 mSeqnoLock;
+        long                        mSeqno;
+
+        std::map<long,VimFunction*>  mWaitingFunctionCalls;
 };
 
 
