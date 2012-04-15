@@ -23,9 +23,11 @@ We will be using the LLVM, LLDB and Clang libraries/APIs for the C language fami
 How to start working ?
 ----------------------
 
-1.  Make sure you have enough free space
+1.  Make sure you have enough free space (about 10GB for LLVM & pals in Debug+Assert only)
 2.  Clone the repository
-3.  Install llvm/clang (for compilation), python-dev and swig (necessary for LLDB's python interface generation), libeditline-dev
+3.  Install llvm/clang (for compilation), python-dev and swig (necessary for LLDB's python interface generation), libedit-dev
 4.  Run “get_llvm.sh”, which will checkout all the needed sources and start building on Debug
-5.  Have a coffee/tea while compiling :)
+5.  Have a coffee/tea while compiling :) (can take a few hours for Debug+Assert)
+6.  Enjoy !
+
 
