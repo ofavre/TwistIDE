@@ -26,3 +26,14 @@ time -f "      Done in %E" svn update --force -q -r $LLVM_REV llvm
 echo "Updating Clang to r$CLANG_REV ..."
 time -f "      Done in %E" svn update --force -q -r $CLANG_REV llvm/tools/clang
 
+echo "Creating 'llvm-build' folder ..."
+mkdir -p llvm-build
+
+echo "Generating build environment (configure) ..."
+cd llvm-build
+../llvm/configure
+
+# Count the number of logical CPUs (since compilation can benefit from hyperthreading anyway)
+CPU=`grep processor /proc/cpuinfo | wc -l`
+echo "Building LLVM & friends ($CPU jobs, since there are $CPU cores) ..."
+make -j$CPU

@@ -19,3 +19,13 @@ What is TwistIDE made of?
 
 We will be using the LLVM, LLDB and Clang libraries/APIs for the C language family support (and integrated debugging).
 
+
+How to start working ?
+----------------------
+
+1.  Make sure you have enough free space
+2.  Clone the repository
+3.  Install llvm/clang (for compilation), python-dev and swig (necessary for LLDB's python interface generation), libeditline-dev
+4.  Run “get_llvm.sh”, which will checkout all the needed sources and start building on Debug
+5.  Have a coffee/tea while compiling :)
+
