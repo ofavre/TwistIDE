@@ -35,5 +35,9 @@ cd llvm-build
 
 # Count the number of logical CPUs (since compilation can benefit from hyperthreading anyway)
 CPU=`grep processor /proc/cpuinfo | wc -l`
-echo "Building LLVM & friends ($CPU jobs, since there are $CPU cores) ..."
+echo "Building LLVM & friends [Debug+Assert] (using $CPU jobs) ..."
 make -j$CPU
+
+echo "Building LLVM & friends [Release] (using $CPU jobs) ..."
+make -j$CPU ENABLE_OPTIMIZED=1
+
