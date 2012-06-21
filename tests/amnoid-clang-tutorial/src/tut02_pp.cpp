@@ -1,4 +1,4 @@
-//! Libs: -lclangDriver -lclangAnalysis -lclangFrontend -lclangSema -lclangAST -lclangParse -lclangLex -lclangBasic
+//! Libs: -lclangDriver -lclangAnalysis -lclangFrontend -lclangSema -lclangAST -lclangParse -lclangLex -lclangBasic -llldb
 
 #include <iostream>
 using namespace std;
@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
   Token Tok;
   do {
     context.pp.Lex(Tok);
-    if (context.diags.hasErrorOccurred())
+    if (context.diagsEngine.hasErrorOccurred())
       break;
     context.pp.DumpToken(Tok);
     cerr << endl;
