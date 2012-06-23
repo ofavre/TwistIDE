@@ -57,7 +57,7 @@ $(foreach part,$(TUTORIAL_PARTS),$(eval $(call TEMPLATE_custom_flags,$(part))))
 # General targets
 #
 
-all: compile
+all: compile compile-debug
 compile: $(PROGS)
 compile-debug: $(PROGS_DEBUG)
 
@@ -75,7 +75,7 @@ dist:
 # File building
 dist/%_d: build/%.o.d | dist custom-flags-%
 	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_DEBUG) $(LD_PROG_CUSTOM_FLAGS) $(LD_LIBS_LLVM)
-build/%.o.d: src/%.cpp | build src/*.hpp src/*.inl src/*.tcc
+build/%.o.d: src/%.cpp | build $(HEADERS)
 	$(CXX) $(CXX_FLAGS) $^ -o $@ $(CXX_FLAGS_DEBUG)
 dist/%: build/%.o | dist custom-flags-%
 	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_RELEASE) $(LD_PROG_CUSTOM_FLAGS) $(LD_LIBS_LLVM)
