@@ -12,10 +12,9 @@ CXX_FLAGS := -c -Wall -Wextra `llvm-config --cxxflags`
 CXX_FLAGS_RELEASE := -g1 -O2
 CXX_FLAGS_DEBUG := -g3 -O0
 LD := g++
-LD_FLAGS :=
+LD_FLAGS := `llvm-config --ldflags`
 LD_FLAGS_RELEASE := -g1
 LD_FLAGS_DEBUG := -g3
-LD_LIBS_LLVM := `llvm-config --ldflags --libs`
 
 
 
@@ -26,31 +25,22 @@ LD_LIBS_LLVM := `llvm-config --ldflags --libs`
 # List each src/*.cpp file and keep the "*" part
 TUTORIAL_PARTS := $(patsubst src/%.cpp, %, $(wildcard src/*.cpp))
 # Derive objects and final program names
-OBJS := $(addprefix build/, $(patsubst %, %.o, $(TUTORIAL_PARTS)))
-OBJS_DEBUG := $(addprefix build/, $(patsubst %, %.o.d, $(TUTORIAL_PARTS)))
 PROGS := $(addprefix dist/, $(patsubst %, %, $(TUTORIAL_PARTS)))
 PROGS_DEBUG := $(addprefix dist/, $(patsubst %, %_d, $(TUTORIAL_PARTS)))
+OBJS := $(addprefix build/, $(patsubst %, %.o, $(TUTORIAL_PARTS)))
+OBJS_DEBUG := $(addprefix build/, $(patsubst %, %.o.d, $(TUTORIAL_PARTS)))
 
+# Keep intermediate objects
 .SECONDARY: $(OBJS) $(OBJS_DEBUG)
-
-# Headers: everything not taken by TUTORIAL_PARTS
-HEADERS := $(filter-out $(patsubst %,src/%.cpp,$(TUTORIAL_PARTS)),$(wildcard src/*))
-
 
 #
 # Program specific configuration
 #
 
-# Define LD_PROG_CUSTOM_FLAGS to the content
-# of a line preceded by '//! Libs: ' in the
-# beginning of the source file
-define TEMPLATE_custom_flags
-.PHONY: custom-flags-$(1)
-custom-flags-$(1): src/$(1).cpp
-custom-flags-$(1): $(eval LD_PROG_CUSTOM_FLAGS := $(shell sed -nre '1,20s/^\/\/! Libs: //p' src/$(1).cpp))
-endef
-# Now define those parts for each tutorial part program
-$(foreach part,$(TUTORIAL_PARTS),$(eval $(call TEMPLATE_custom_flags,$(part))))
+# We use sed to generate shell commands that will convert "//! Libs: " and "//! LLVM-Components: " comments into the final values.
+# It is important to preserve the order of the comments are ld(1) is order sensitive (every symbols must be defined before linked against).
+custom_flags = \
+	$(shell $(shell sed -nre '{ s/^\/\/! Libs: +(.+)$$/echo "\1";/p; t; s/^\/\/! LLVM-Components: +(.+)$$/llvm-config --libs \1;/p; }' src/$(1).cpp))
 
 
 #
@@ -73,12 +63,12 @@ dist:
 	mkdir -p $@
 
 # File building
-dist/%_d: build/%.o.d | dist custom-flags-%
-	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_DEBUG) $(LD_PROG_CUSTOM_FLAGS) $(LD_LIBS_LLVM)
-build/%.o.d: src/%.cpp | build $(HEADERS)
+dist/%_d: build/%.o.d | dist
+	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_DEBUG) $(call custom_flags,$*)
+build/%.o.d: src/%.cpp | build
 	$(CXX) $(CXX_FLAGS) $^ -o $@ $(CXX_FLAGS_DEBUG)
-dist/%: build/%.o | dist custom-flags-%
-	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_RELEASE) $(LD_PROG_CUSTOM_FLAGS) $(LD_LIBS_LLVM)
-build/%.o: src/%.cpp | build $(HEADERS)
+dist/%: build/%.o | dist
+	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_RELEASE) $(call custom_flags,$*)
+build/%.o: src/%.cpp | build
 	$(CXX) $(CXX_FLAGS) $^ -o $@ $(CXX_FLAGS_RELEASE)
 
