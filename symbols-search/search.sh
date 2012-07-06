@@ -1,5 +1,6 @@
 #!/bin/bash
 
+progdir="$(dirname "$0")"
 if [ "$#" -eq 0 -o "$1" == "-h" -o "$1" == "--help" ]; then
     cat <<EOS
 Usage: $0 -h, --help
@@ -12,14 +13,14 @@ EOS
 fi
 
 # Open the subsidiary files that must not take part in grep results
-exec 3<data.prefix
-exec 5<data.source
+exec 3<"$progdir"/data.prefix
+exec 5<"$progdir"/data.source
 
 # Simple grep output, with no line number coloring and no file name,
 # but with match coloring.
 symbol="$1"
 shift
-GREP_COLORS="ln=:se=" grep --no-filename -n -F -e "$symbol" --color=always "$@" -- data.content | (
+GREP_COLORS="ln=:se=" grep --no-filename -n -F -e "$symbol" --color=always "$@" -- "$progdir"/data.content | (
     # Read grep line numbers, and catch up with the subsidiary files,
     # then output the content of the Nth line for each files.
     currentLine=0

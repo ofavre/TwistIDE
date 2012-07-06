@@ -8,13 +8,13 @@
 #
 
 CXX := g++
-CXX_FLAGS := -c -Wall -Wextra `llvm-config --cxxflags`
-CXX_FLAGS_RELEASE := -g1 -O2
-CXX_FLAGS_DEBUG := -g3 -O0
+CXXFLAGS += -c -Wall -Wextra `llvm-config --cxxflags`
+CXXFLAGS_RELEASE += -g1 -O2
+CXXFLAGS_DEBUG += -g3 -O0
 LD := g++
-LD_FLAGS := `llvm-config --ldflags`
-LD_FLAGS_RELEASE := -g1
-LD_FLAGS_DEBUG := -g3
+LDFLAGS += `llvm-config --ldflags`
+LDFLAGS_RELEASE += -g1
+LDFLAGS_DEBUG += -g3
 
 
 
@@ -64,11 +64,11 @@ dist:
 
 # File building
 dist/%_d: build/%.o.d | dist
-	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_DEBUG) $(call custom_flags,$*)
+	$(LD) $(LDFLAGS) $^ -o $@ $(LDFLAGS_DEBUG) $(call custom_flags,$*)
 build/%.o.d: src/%.cpp | build
-	$(CXX) $(CXX_FLAGS) $^ -o $@ $(CXX_FLAGS_DEBUG)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(CXXFLAGS_DEBUG)
 dist/%: build/%.o | dist
-	$(LD) $(LD_FLAGS) $^ -o $@ $(LD_FLAGS_RELEASE) $(call custom_flags,$*)
+	$(LD) $(LDFLAGS) $^ -o $@ $(LDFLAGS_RELEASE) $(call custom_flags,$*)
 build/%.o: src/%.cpp | build
-	$(CXX) $(CXX_FLAGS) $^ -o $@ $(CXX_FLAGS_RELEASE)
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(CXXFLAGS_RELEASE)
 
