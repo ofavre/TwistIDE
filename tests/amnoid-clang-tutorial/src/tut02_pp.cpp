@@ -1,4 +1,4 @@
-//! Libs: -lclangDriver -lclangAnalysis -lclangFrontend -lclangSema -lclangAST -lclangParse -lclangLex -lclangBasic -llldb
+//! Libs: -lLLVM-3.1svn -lclangFrontend -lclangParse -lclangDriver -lclangSerialization -lclangSema -lclangEdit -lclangAnalysis -lclangAST -lclangLex -lclangBasic
 
 #include <iostream>
 using namespace std;

@@ -31,7 +31,7 @@ struct PPContext
 {
     // Takes ownership of client.
     PPContext(clang::DiagnosticConsumer* client = 0, const std::string& triple = llvm::sys::getDefaultTargetTriple())
-    : rawOstream(std::cout)
+    : rawOstream(llvm::outs()) // can use std::cout too
     , diagClient(client == 0 ? new clang::TextDiagnosticPrinter(rawOstream, diagOpts) : client)
     , diagsEngine(refs, diagClient, true) // Takes ownership of client
     , diags(&diagsEngine)
@@ -56,7 +56,7 @@ struct PPContext
     }
 
     llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> refs;
-    llvm::raw_os_ostream rawOstream;
+    llvm::raw_ostream& rawOstream;
     clang::DiagnosticOptions diagOpts;
     clang::DiagnosticConsumer* diagClient; // Owned by diags, do not free
     clang::DiagnosticsEngine diagsEngine;
