@@ -53,10 +53,6 @@ ending_included() {
 # Begin of script #
 ###################
 
-# Note the old flags
-LDFLAGS=($LDFLAGS)
-oldFlagsCount="${#LDFLAGS[@]}"
-
 # Get our directory so we can call other sibling scripts
 progdir="$(dirname "$0")"
 
@@ -68,6 +64,7 @@ mkfifo "$tmpfifo"
 
 # Execute the provided command, and if it fails,
 # analyze its output
+LDFLAGS=()
 if "$@" 2> "$tmp"; then
     newflags="unnecessary"
 else
@@ -208,7 +205,6 @@ case "$newflags" in
         ;;
     yes)
         echo "Here are the libraries you were missing:"
-        LDFLAGS[0]="" # remove the old flags taken from the environment
         echo "${LDFLAGS[@]}"
         ;;
     none)
