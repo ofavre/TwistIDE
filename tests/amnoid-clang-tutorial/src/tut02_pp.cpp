@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
   }
   context.sm.createMainFileID(File);
   context.pp.EnterMainSourceFile();
+  context.diagClient->BeginSourceFile(context.opts, &context.pp);
 
   // Parse it
   Token Tok;
@@ -35,6 +36,8 @@ int main(int argc, char* argv[])
     context.pp.DumpToken(Tok);
     cerr << endl;
   } while (Tok.isNot(tok::eof));
+
+  context.diagClient->EndSourceFile();
 
   return EXIT_SUCCESS;
 }
