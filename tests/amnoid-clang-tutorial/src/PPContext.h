@@ -24,6 +24,7 @@
 
 
 #include "TargetOptionsBuilder.h"
+#include "LangOptionsBuilder.h"
 
 
 
@@ -35,7 +36,8 @@ struct PPContext
     , diagClient(client == 0 ? new clang::TextDiagnosticPrinter(rawOstream, diagOpts) : client)
     , diagsEngine(refs, diagClient, true) // Takes ownership of client
     , diags(&diagsEngine)
-    , targetOptions((clang::TargetOptions){triple, "", "", "", "", std::vector<std::string>()})
+    , opts(LangOptionsBuilder::newToFree().setC99(true).getLangOptionsAndFree())
+    , targetOptions(TargetOptionsBuilder::constructor(triple))
     , target(clang::TargetInfo::CreateTargetInfo(diagsEngine, targetOptions))
     , fm(fso)
     , headers(fm, diagsEngine, opts, target)
