@@ -4,23 +4,23 @@
 #include <iostream>
 #include <string>
 
-#include "llvm/Config/config.h"
-#include "llvm/Support/raw_os_ostream.h"
-#include "llvm/Support/Host.h" // getDefaultTargetTriple()
+#include <llvm/Config/config.h>
+#include <llvm/Support/raw_os_ostream.h>
+#include <llvm/Support/Host.h> // getDefaultTargetTriple()
 
-#include "clang/Basic/Diagnostic.h"
-#include "clang/Basic/DiagnosticIDs.h"
-#include "clang/Basic/TargetInfo.h"
-#include "clang/Basic/TargetOptions.h"
-#include "clang/Basic/SourceManager.h"
-#include "clang/Basic/FileManager.h"
+#include <clang/Basic/Diagnostic.h>
+#include <clang/Basic/DiagnosticIDs.h>
+#include <clang/Basic/TargetInfo.h>
+#include <clang/Basic/TargetOptions.h>
+#include <clang/Basic/SourceManager.h>
+#include <clang/Basic/FileManager.h>
 
-#include "clang/Lex/HeaderSearch.h"
-#include "clang/Lex/Preprocessor.h"
+#include <clang/Lex/HeaderSearch.h>
+#include <clang/Lex/Preprocessor.h>
 
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/DiagnosticOptions.h"
-#include "clang/Frontend/TextDiagnosticPrinter.h"
+#include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/DiagnosticOptions.h>
+#include <clang/Frontend/TextDiagnosticPrinter.h>
 
 
 #include "TargetOptionsBuilder.h"
