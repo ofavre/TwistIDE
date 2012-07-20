@@ -20,7 +20,8 @@ int main(int argc, char* argv[])
 
   // Add header search directories
   PreprocessorOptions ppOpts;
-  HeaderSearchOptions hdrOpts;
+  HeaderSearchOptions hdrOpts ("/usr/");
+  hdrOpts.Verbose = true;
   FrontendOptions feOpts;
   clang::InitializePreprocessor(context.pp, ppOpts, hdrOpts, feOpts);
   // This is somehow still insufficient to make the preprocessor recognise <stdio.h>...
