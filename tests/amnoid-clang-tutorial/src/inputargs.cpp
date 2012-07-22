@@ -22,6 +22,8 @@ using clang::DiagnosticOptions;
 using clang::TextDiagnosticPrinter;
 using clang::DiagnosticConsumer;
 using clang::DiagnosticsEngine;
+using clang::TargetInfo;
+using llvm::sys::getDefaultTargetTriple;
 
 
 int main(int argc, char* argv[])
@@ -43,13 +45,22 @@ int main(int argc, char* argv[])
   CompilerInvocation cInvoc;
   CompilerInvocation::CreateFromArgs(cInvoc, argv + 2, argv + argc, diagsEngine);
 
-  clang::TargetOptions targetOptions;
-  targetOptions.Triple = llvm::sys::getDefaultTargetTriple();
-  clang::TargetInfo* targetInfo = clang::TargetInfo::CreateTargetInfo(diagsEngine, targetOptions);
+  TargetOptions targetOptions;
+  targetOptions.Triple = getDefaultTargetTriple();
+  TargetInfo* targetInfo = TargetInfo::CreateTargetInfo(diagsEngine, targetOptions);
+
+  FileSystemOptions fsOpts;
+  FileManager fileMgr (fsOpts);
+
+  SourceManager srcMgr (diagsEngine, fileMgr);
 
   CompilerInstance ci;
   ci.setInvocation(&cInvoc);
+  ci.setDiagnostics(&diagsEngine);
   ci.setTarget(targetInfo);
+  ci.setFileManager(&fileMgr);
+  ci.setSourceManager(&srcMgr);
+  ci.createPreprocessor();
   ci.getLangOpts().C99 = true;
 
 
