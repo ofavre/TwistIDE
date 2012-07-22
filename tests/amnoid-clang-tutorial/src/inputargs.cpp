@@ -33,36 +33,17 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  //InputArgList inputArgs (argv, argv + argc);
-
-  llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs> refs;
-  DiagnosticOptions diagOpts;
-  TextDiagnosticPrinter textDiagPrinter (llvm::outs(), diagOpts);
-  DiagnosticConsumer& diagConsumer = textDiagPrinter;
-  DiagnosticsEngine diagsEngine (refs, &diagConsumer, true);
-  diagsEngine.setDiagnosticMapping(diag::DIAG_START_ANALYSIS, diag::MAP_IGNORE, SourceLocation());
-
-  CompilerInvocation cInvoc;
-  CompilerInvocation::CreateFromArgs(cInvoc, argv + 2, argv + argc, diagsEngine);
-
   TargetOptions targetOptions;
   targetOptions.Triple = getDefaultTargetTriple();
-  TargetInfo* targetInfo = TargetInfo::CreateTargetInfo(diagsEngine, targetOptions);
-
-  FileSystemOptions fsOpts;
-  FileManager fileMgr (fsOpts);
-
-  SourceManager srcMgr (diagsEngine, fileMgr);
 
   CompilerInstance ci;
-  ci.setInvocation(&cInvoc);
-  ci.setDiagnostics(&diagsEngine);
-  ci.setTarget(targetInfo);
-  ci.setFileManager(&fileMgr);
-  ci.setSourceManager(&srcMgr);
+  ci.createDiagnostics(argc - 1, argv + 2);
+  ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOptions));
+  ci.createFileManager();
+  ci.createSourceManager(ci.getFileManager());
   ci.createPreprocessor();
-  ci.getLangOpts().C99 = true;
 
+  ci.getDiagnostics().setDiagnosticMapping(diag::DIAG_START_ANALYSIS, diag::MAP_IGNORE, SourceLocation());
 
   // Add input file
   const FileEntry* File = ci.getFileManager().getFile(argv[1]);
@@ -72,19 +53,19 @@ int main(int argc, char* argv[])
   }
   ci.getSourceManager().createMainFileID(File);
   ci.getPreprocessor().EnterMainSourceFile();
-  diagConsumer.BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
+  ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
 
   // Parse it
   Token Tok;
   do {
     ci.getPreprocessor().Lex(Tok);
-    if (diagsEngine.hasErrorOccurred())
+    if (ci.getDiagnostics().hasErrorOccurred())
       break;
     ci.getPreprocessor().DumpToken(Tok);
     cerr << endl;
   } while (Tok.isNot(tok::eof));
 
-  diagConsumer.EndSourceFile();
+  ci.getDiagnosticClient().EndSourceFile();
 
   return EXIT_SUCCESS;
 }
