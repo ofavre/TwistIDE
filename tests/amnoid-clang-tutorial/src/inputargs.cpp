@@ -10,6 +10,7 @@ using namespace std;
 #include <clang/Basic/FileManager.h>
 #include <clang/Driver/ArgList.h>
 #include <clang/Lex/Preprocessor.h>
+#include <clang/Frontend/FrontendActions.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/DiagnosticOptions.h>
@@ -24,6 +25,7 @@ using clang::DiagnosticConsumer;
 using clang::DiagnosticsEngine;
 using clang::TargetInfo;
 using llvm::sys::getDefaultTargetTriple;
+using clang::PrintPreprocessedAction;
 
 
 int main(int argc, char* argv[])
@@ -51,17 +53,9 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  // Parse it
-  Token Tok;
-  do {
-    ci.getPreprocessor().Lex(Tok);
-    if (ci.getDiagnostics().hasErrorOccurred())
-      break;
-    ci.getPreprocessor().DumpToken(Tok);
-    cerr << endl;
-  } while (Tok.isNot(tok::eof));
+  PrintPreprocessedAction printPpAction;
 
-  ci.getDiagnosticClient().EndSourceFile();
+  ci.ExecuteAction(printPpAction);
 
   return EXIT_SUCCESS;
 }
