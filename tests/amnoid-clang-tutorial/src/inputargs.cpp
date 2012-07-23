@@ -46,14 +46,10 @@ int main(int argc, char* argv[])
   ci.getDiagnostics().setDiagnosticMapping(diag::DIAG_START_ANALYSIS, diag::MAP_IGNORE, SourceLocation());
 
   // Add input file
-  const FileEntry* File = ci.getFileManager().getFile(argv[1]);
-  if (!File) {
-    cerr << "Failed to open \'" << argv[1] << "\'";
+  if (!ci.InitializeSourceManager(argv[1], SrcMgr::C_User)) {
+    cerr << "Failed to open \'" << argv[1] << "\'" << endl;
     return EXIT_FAILURE;
   }
-  ci.getSourceManager().createMainFileID(File);
-  ci.getPreprocessor().EnterMainSourceFile();
-  ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
 
   // Parse it
   Token Tok;
