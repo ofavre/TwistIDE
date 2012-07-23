@@ -28,34 +28,49 @@ using llvm::sys::getDefaultTargetTriple;
 using clang::PrintPreprocessedAction;
 
 
+static const char *getInputKindName(InputKind Kind);
+
+
 int main(int argc, char* argv[])
 {
   if (argc < 2) {
-    cerr << "Usage: " << argv[0] << " source.cpp [clang-options]" << endl;
+    cerr << "Usage: " << argv[0] << " [clang-options] source.cpp" << endl;
+    cerr << "Any clang option is usable, source files may be listed among in no particular order." << endl;
     return EXIT_FAILURE;
   }
-
-  TargetOptions targetOptions;
-  targetOptions.Triple = getDefaultTargetTriple();
 
   CompilerInstance ci;
-  ci.createDiagnostics(argc - 1, argv + 2);
-  ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOptions));
-  ci.createFileManager();
-  ci.createSourceManager(ci.getFileManager());
-  ci.createPreprocessor();
+  ci.createDiagnostics(argc, argv + 1);
+  CompilerInvocation::CreateFromArgs(ci.getInvocation(), argv + 1, argv + argc, ci.getDiagnostics());
 
-  ci.getDiagnostics().setDiagnosticMapping(diag::DIAG_START_ANALYSIS, diag::MAP_IGNORE, SourceLocation());
-
-  // Add input file
-  if (!ci.InitializeSourceManager(argv[1], SrcMgr::C_User)) {
-    cerr << "Failed to open \'" << argv[1] << "\'" << endl;
-    return EXIT_FAILURE;
-  }
+  vector<FrontendInputFile>& inputs = ci.getFrontendOpts().Inputs;
+  cout << "Input files: (" << inputs.size() << ")" << endl;
+  for (vector<FrontendInputFile>::const_iterator it = inputs.begin(), end = inputs.end() ; it != end ; ++it)
+    cout << " - type:" << getInputKindName(it->Kind) << "\tfrom:" << (it->IsSystem ? "system" : "user") << "\tname:\"" << it->File << "\"" << endl;
 
   PrintPreprocessedAction printPpAction;
-
   ci.ExecuteAction(printPpAction);
 
   return EXIT_SUCCESS;
+}
+
+static const char *getInputKindName(InputKind Kind) {
+  switch (Kind) {
+  case IK_None:              break;
+  case IK_AST:               return "ast";
+  case IK_Asm:               return "assembler-with-cpp";
+  case IK_C:                 return "c";
+  case IK_CXX:               return "c++";
+  case IK_LLVM_IR:           return "ir";
+  case IK_ObjC:              return "objective-c";
+  case IK_ObjCXX:            return "objective-c++";
+  case IK_OpenCL:            return "cl";
+  case IK_CUDA:              return "cuda";
+  case IK_PreprocessedC:     return "cpp-output";
+  case IK_PreprocessedCXX:   return "c++-cpp-output";
+  case IK_PreprocessedObjC:  return "objective-c-cpp-output";
+  case IK_PreprocessedObjCXX:return "objective-c++-cpp-output";
+  }
+
+  llvm_unreachable("Unexpected language kind!");
 }
