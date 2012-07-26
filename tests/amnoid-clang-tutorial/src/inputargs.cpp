@@ -14,6 +14,7 @@ using namespace std;
 #include <clang/Driver/Action.h>
 #include <clang/Driver/Job.h>
 #include <clang/Driver/Tool.h>
+#include <clang/Driver/ToolChain.h>
 #include <clang/Lex/Preprocessor.h>
 #include <clang/Frontend/FrontendActions.h>
 #include <clang/Frontend/CompilerInstance.h>
@@ -31,13 +32,19 @@ using llvm::ArrayRef;
 using clang::driver::Driver;
 using clang::driver::Compilation;
 using clang::driver::Command;
+using clang::driver::ArgStringList;
 using clang::driver::ActionList;
 using clang::driver::Action;
 using clang::driver::InputAction;
+using clang::driver::PreprocessJobAction;
 using clang::driver::Job;
+using clang::driver::JobAction;
 using clang::driver::JobList;
 using clang::driver::Tool;
+using clang::driver::ToolChain;
 
+
+int parseArgsAndProceed(int argc, const char* argv[]);
 
 static llvm::sys::Path GetExecutablePath(const char *Argv0, bool CanonicalPrefixes);
 int ExecuteCompilation(const Driver* that, const Compilation &C,
@@ -48,7 +55,7 @@ int ExecuteJob(const Compilation* that, const Job &J,
                             const Command *&FailingCommand);
 
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
   if (argc < 2) {
     cerr << "Usage: " << argv[0] << " [clang-options] source.cpp" << endl;
@@ -56,15 +63,33 @@ int main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
+  return parseArgsAndProceed(argc, argv);
+}
+
+int parseArgsAndProceed(int argc, const char* argv[]) {
   CompilerInstance ci;
-  ci.createDiagnostics(argc, argv + 1);
+  ci.createDiagnostics(argc, argv);
 
   Path path = GetExecutablePath(argv[0], true);
   Driver driver (path.str(), getDefaultTargetTriple(), "a.out", true, ci.getDiagnostics());
   driver.CCCIsCPP = true; // only preprocess
   OwningPtr<Compilation> compil (driver.BuildCompilation(llvm::ArrayRef<const char*>(argv, argc)));
   if (!compil) {
-    cerr << "Could not build a Compilation!" << endl;
+    cerr << "Cannot build the compilation." << endl;
+    return EXIT_FAILURE;
+  }
+  if (driver.getDiags().hasErrorOccurred()) {
+    cerr << "Error occurred building the compilation." << endl;
+    // We must provide a Command that failed to use Driver::generateCompilationDiagnostics()
+    // That Command will only be used as follows: ``if (FailingCommand->getCreator().isLinkJob()) return;''
+    // Hence we'll have to create a fake command with a tool that will answer no to isLinkJob(),
+    // As we only have PreprocessorJobActions, the first generated action will do.
+    JobAction& fakeAction = *dyn_cast<JobAction>(*compil->getActions().begin());
+    Tool& fakeCreator = compil->getDefaultToolChain().SelectTool(*compil, fakeAction, fakeAction.getInputs());
+    Command fakeCommand (fakeAction, fakeCreator, /*Executable*/NULL, ArgStringList());
+    cerr << "DIAGNOSTIC:" << endl;
+    driver.generateCompilationDiagnostics(*compil, &fakeCommand);
+    cerr << "END OF DIAGNOSTIC" << endl;
     return EXIT_FAILURE;
   }
 
@@ -147,27 +172,9 @@ int ExecuteCompilation(const Driver* that, const Compilation &C,
 
   int Res = ExecuteJob(&C, C.getJobs(), FailingCommand);
 
-  // Remove temp files.
-  C.CleanupFileList(C.getTempFiles());
-
   // If the command succeeded, we are done.
   if (Res == 0)
     return Res;
-
-  // Otherwise, remove result files as well.
-  if (!C.getArgs().hasArg(clang::driver::options::OPT_save_temps)) {
-    C.CleanupFileList(C.getResultFiles(), true);
-
-    // Failure result files are valid unless we crashed.
-    if (Res < 0) {
-      C.CleanupFileList(C.getFailureResultFiles(), true);
-#ifdef _WIN32
-      // Exit status should not be negative on Win32,
-      // unless abnormal termination.
-      Res = 1;
-#endif
-    }
-  }
 
   // Print extra information about abnormal failures, if possible.
   //
@@ -195,12 +202,6 @@ int ExecuteCompilation(const Driver* that, const Compilation &C,
 /// Changed to print command options, and not execute anything.
 int ExecuteCommand(const Compilation* that, const Command &C,
                                 const Command *&FailingCommand) {
-  llvm::sys::Path Prog(C.getExecutable());
-  const char **Argv = new const char*[C.getArguments().size() + 2];
-  Argv[0] = C.getExecutable();
-  std::copy(C.getArguments().begin(), C.getArguments().end(), Argv+1);
-  Argv[C.getArguments().size() + 1] = 0;
-
   if ((that->getDriver().CCCEcho || that->getDriver().CCPrintOptions ||
        that->getArgs().hasArg(clang::driver::options::OPT_v)) && !that->getDriver().CCGenDiagnostics) {
     raw_ostream *OS = &llvm::errs();
@@ -230,26 +231,16 @@ int ExecuteCommand(const Compilation* that, const Command &C,
       delete OS;
   }
 
-  for (const char** i = Argv ; *i ; ++i)
-    cout << "\"" << *i << "\" ";
-  cout << endl;
-
-  std::string Error;
+  int argc = C.getArguments().size();
+  const char* *argv = new const char* [argc+1];
+  argv[0] = C.getExecutable();
+  std::copy(C.getArguments().begin(), C.getArguments().end(), argv+1);
   int Res = 0;
-  // Do not execute
-  // Res = llvm::sys::Program::ExecuteAndWait(Prog, Argv,
-  //                                    /*env*/0, /*that->Redirects (unfortunately private and inacessible)*/0,
-  //                                    /*secondsToWait*/0, /*memoryLimit*/0,
-  //                                    &Error);
-  if (!Error.empty()) {
-    assert(Res && "Error string set with 0 result code!");
-    that->getDriver().Diag(clang::diag::err_drv_command_failure) << Error;
-  }
+  Res = parseArgsAndProceed(argc, argv);
 
   if (Res)
     FailingCommand = &C;
 
-  delete[] Argv;
   return Res;
 }
 
