@@ -57,8 +57,8 @@ ending_included() {
 progdir="$(dirname "$0")"
 
 # Create a temporary output file and a fifo
-tmp="$(mktemp tmp-resolve-compile-XXXXXX.out)"
-tmpfifo="$(mktemp tmp-resolve-compile-XXXXXX.fifo)"
+tmp="$(mktemp tmp-resolve-compile.out.XXXXXX)"
+tmpfifo="$(mktemp tmp-resolve-compile.fifo.XXXXXX)"
 rm "$tmpfifo"
 mkfifo "$tmpfifo"
 
