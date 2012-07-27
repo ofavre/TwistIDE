@@ -1,4 +1,4 @@
-//! Libs: -lLLVM-3.1svn -lclangFrontend -lclangParse -lclangDriver -lclangSerialization -lclangSema -lclangEdit -lclangAnalysis -lclangAST -lclangLex -lclangBasic
+//! Libs: -lclangFrontendTool -lLLVM-3.1svn -lclangARCMigrate -lclangStaticAnalyzerFrontend -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore -lclangIndex -lclangRewrite -lclangCodeGen -lclangFrontend -lclangParse -lclangDriver -lclangSerialization -lclangSema -lclangEdit -lclangAnalysis -lclangAST -lclangLex -lclangBasic
 
 #include <iostream>
 using namespace std;
@@ -20,6 +20,8 @@ using namespace std;
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Frontend/Utils.h>
+#include <clang/FrontendTool/Utils.h>
+#include <clang/Frontend/FrontendDiagnostic.h>
 using namespace clang;
 using llvm::dyn_cast;
 using clang::driver::Arg;
@@ -45,6 +47,8 @@ using clang::driver::ToolChain;
 
 
 int parseArgsAndProceed(int argc, const char* argv[]);
+int parseCC1AndProceed(int argc, const char* argv[]);
+static void LLVMErrorHandler(void *UserData, const std::string &Message);
 
 static llvm::sys::Path GetExecutablePath(const char *Argv0, bool CanonicalPrefixes);
 int ExecuteCompilation(const Driver* that, const Compilation &C,
@@ -66,7 +70,12 @@ int main(int argc, const char* argv[])
   return parseArgsAndProceed(argc, argv);
 }
 
-int parseArgsAndProceed(int argc, const char* argv[]) {
+int parseArgsAndProceed(int argc, const char* argv[])
+{
+  if (argc >= 1 && !strcmp("-cc1", argv[0])) {
+    return parseCC1AndProceed(argc, argv);
+  }
+
   CompilerInstance ci;
   ci.createDiagnostics(argc, argv);
 
@@ -136,6 +145,37 @@ int parseArgsAndProceed(int argc, const char* argv[]) {
 
   return EXIT_SUCCESS;
 }
+
+/// Simplified from tools/clang/tools/driver/cc1_main.cpp.
+/// Parses -cc1 arguments and performs the required action.
+int parseCC1AndProceed(int argc, const char* argv[])
+{
+  CompilerInstance ci;
+  ci.createDiagnostics(argc, argv);
+
+  if (!CompilerInvocation::CreateFromArgs(ci.getInvocation(), argv, argv+argc, ci.getDiagnostics()))
+    return 1;
+
+  llvm::install_fatal_error_handler(LLVMErrorHandler, static_cast<void*>(&ci.getDiagnostics()));
+
+  int Res = 0;
+  Res = ExecuteCompilerInvocation(&ci) ? 1 : 0;
+
+  llvm::remove_fatal_error_handler();
+
+  return Res;
+}
+
+static void LLVMErrorHandler(void *UserData, const std::string &Message)
+{
+  DiagnosticsEngine &Diags = *static_cast<DiagnosticsEngine*>(UserData);
+
+  Diags.Report(diag::err_fe_error_backend) << Message;
+
+  // We cannot recover from llvm errors.
+  exit(1);
+}
+
 
 
 /// Copied from tools/driver/driver.cpp, where it was a static (local) function.
