@@ -219,7 +219,7 @@ esac
 exit 0
 
 # <![sed:extract undefined symbols[
-s/^.*:[0-9]+: undefined reference to `(.*)'$/\1/p
+s/^.*: undefined reference to [`'](.*)'$/\1/p
 # ]]>
 
 # <![sed:gcc std::string[
