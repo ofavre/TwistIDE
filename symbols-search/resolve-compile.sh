@@ -223,5 +223,6 @@ s/^.*: undefined reference to [`'](.*)'$/\1/p
 # ]]>
 
 # <![sed:gcc std::string[
-s/std::basic_string<char, std::char_traits<char>, std::allocator<char> >/std::string/
+s/std::basic_string<char, std::char_traits<char>, std::allocator<char> > >/std::string>/g
+s/std::basic_string<char, std::char_traits<char>, std::allocator<char> >/std::string/g
 # ]]>
