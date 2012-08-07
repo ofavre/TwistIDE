@@ -1,9 +1,16 @@
 #!/bin/bash
 
 # Build files list
-[ -f files.lst ] || touch files.lst
-# Append libraries known to llvm-config
-llvm-config --libfiles all | tr ' ' '\n' >> files.lst
+if ! [ -f files.lst ]; then
+    echo "Use the following command to bootstrap your files.lst:"
+    echo "    # Append libraries known to llvm-config"
+    echo "    llvm-config --libfiles all | tr ' ' '\n' >> files.lst"
+    echo "If you used create_shared_libs.sh, them run the following:"
+    echo "    # Convert all .a to .so"
+    echo "    sed -i -e 's/\.a$/.so/' files.lst"
+    echo "You may then re-run this script."
+    exit 1
+fi
 # Deduplicate
 sort -u files.lst > files.lst.uniq
 mv files.lst.uniq files.lst
