@@ -164,7 +164,7 @@ int parseCC1AndProceed(int argc, const char* argv[])
   llvm::install_fatal_error_handler(LLVMErrorHandler, static_cast<void*>(&ci.getDiagnostics()));
 
   int Res = 0;
-  Res = ExecuteCompilerInvocation(&ci) ? 1 : 0;
+  Res = ExecuteCompilerInvocation(&ci) ? 0 : 1;
 
   llvm::remove_fatal_error_handler();
 
