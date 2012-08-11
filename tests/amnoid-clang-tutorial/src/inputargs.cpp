@@ -72,7 +72,12 @@ int main(int argc, const char* argv[])
 
 int parseArgsAndProceed(int argc, const char* argv[])
 {
-  if (argc >= 1 && !strcmp("-cc1", argv[0])) {
+  cout << "> ";
+  for (int i = 0 ; i < argc ; ++i)
+    cout << "\"" << argv[i] << "\" ";
+  cout << endl;
+
+  if (argc >= 1+1 && !strcmp("-cc1", argv[1])) {
     return parseCC1AndProceed(argc, argv);
   }
 
@@ -153,7 +158,7 @@ int parseCC1AndProceed(int argc, const char* argv[])
   CompilerInstance ci;
   ci.createDiagnostics(argc, argv);
 
-  if (!CompilerInvocation::CreateFromArgs(ci.getInvocation(), argv, argv+argc, ci.getDiagnostics()))
+  if (!CompilerInvocation::CreateFromArgs(ci.getInvocation(), argv+1, argv+argc, ci.getDiagnostics()))
     return 1;
 
   llvm::install_fatal_error_handler(LLVMErrorHandler, static_cast<void*>(&ci.getDiagnostics()));
@@ -271,8 +276,8 @@ int ExecuteCommand(const Compilation* that, const Command &C,
       delete OS;
   }
 
-  int argc = C.getArguments().size();
-  const char* *argv = new const char* [argc+1];
+  int argc = C.getArguments().size() + 1;
+  const char* *argv = new const char* [argc];
   argv[0] = C.getExecutable();
   std::copy(C.getArguments().begin(), C.getArguments().end(), argv+1);
   int Res = 0;
