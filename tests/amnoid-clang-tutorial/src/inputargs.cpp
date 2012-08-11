@@ -148,7 +148,7 @@ int parseArgsAndProceed(int argc, const char* argv[])
   if (Res < 0)
     driver.generateCompilationDiagnostics(*compil, FailingCommand);
 
-  return EXIT_SUCCESS;
+  return Res;
 }
 
 /// Simplified from tools/clang/tools/driver/cc1_main.cpp.
