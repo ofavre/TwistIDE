@@ -86,6 +86,7 @@ int parseArgsAndProceed(int argc, const char* argv[])
 
   Path path = GetExecutablePath(argv[0], true);
   Driver driver (path.str(), getDefaultTargetTriple(), "a.out", true, ci.getDiagnostics());
+  driver.ResourceDir = "/usr/local/lib/clang/3.1";
   driver.CCCIsCPP = true; // only preprocess
   OwningPtr<Compilation> compil (driver.BuildCompilation(llvm::ArrayRef<const char*>(argv, argc)));
   if (!compil) {
