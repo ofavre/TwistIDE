@@ -1,4 +1,2 @@
-llvm
-llvm-build
-
-
+/llvm
+/llvm-build

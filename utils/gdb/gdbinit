@@ -1,0 +1,27 @@
+python
+# Add the necessary import folder
+import sys
+import glob
+sys.path.extend(sorted(glob.glob('/usr/share/gcc-*/python'), reverse=True))
+
+# Load stdc++6 pretty printers
+try:
+    from libstdcxx.v6.printers import register_libstdcxx_printers
+    register_libstdcxx_printers (None)
+
+# Load LLVM pretty printers
+try:
+    from llvm.printers import register_llvm_printers
+    register_llvm_printers (None)
+end
+
+
+# Additional GDB options
+set print pretty on
+set print array on
+set print object on
+set print static-members on
+set print vtbl on
+set print demangle on
+set demangle-style gnu-v3
+set print sevenbit-strings off
