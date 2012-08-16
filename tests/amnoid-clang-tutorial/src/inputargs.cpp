@@ -59,6 +59,8 @@ int ExecuteJob(const Compilation* that, const Job &J,
                             const Command *&FailingCommand);
 
 
+Path executablePath;
+
 int main(int argc, const char* argv[])
 {
   if (argc < 2) {
@@ -85,6 +87,7 @@ int parseArgsAndProceed(int argc, const char* argv[])
   ci.createDiagnostics(argc, argv);
 
   Path path = GetExecutablePath(argv[0], true);
+  executablePath = path;
   Driver driver (path.str(), getDefaultTargetTriple(), "a.out", true, ci.getDiagnostics());
   driver.ResourceDir = "/usr/local/lib/clang/3.1";
   driver.CCCIsCPP = true; // only preprocess
@@ -161,6 +164,9 @@ int parseCC1AndProceed(int argc, const char* argv[])
 
   if (!CompilerInvocation::CreateFromArgs(ci.getInvocation(), argv+1, argv+argc, ci.getDiagnostics()))
     return 1;
+
+  // Remove --disable-free
+  ci.getFrontendOpts().DisableFree = false;
 
   llvm::install_fatal_error_handler(LLVMErrorHandler, static_cast<void*>(&ci.getDiagnostics()));
 
@@ -248,6 +254,11 @@ int ExecuteCompilation(const Driver* that, const Compilation &C,
 /// Changed to print command options, and not execute anything.
 int ExecuteCommand(const Compilation* that, const Command &C,
                                 const Command *&FailingCommand) {
+  // Don't use this program (via parseArgsAndProceed())
+  // if the executable to be used is not this one!
+  if (Path(C.getExecutable()) != executablePath) {
+    return that->ExecuteCommand(C, FailingCommand);
+  }
   if ((that->getDriver().CCCEcho || that->getDriver().CCPrintOptions ||
        that->getArgs().hasArg(clang::driver::options::OPT_v)) && !that->getDriver().CCGenDiagnostics) {
     raw_ostream *OS = &llvm::errs();
