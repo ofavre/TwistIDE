@@ -60,16 +60,43 @@ int ExecuteJob(const Compilation* that, const Job &J,
 
 
 Path executablePath;
+string completionLocationStr;
 
 int main(int argc, const char* argv[])
 {
   if (argc < 2) {
-    cerr << "Usage: " << argv[0] << " [clang-options] source.cpp" << endl;
-    cerr << "Any clang option is usable, source files may be listed among in no particular order." << endl;
+    cerr << "Usage: " << argv[0] << " [clang-options] source.cpp:LINE:COL" << endl;
+    cerr << "Outputs code-completion proposals for the given source file location." << endl;
+    cerr << "Any clang option is usable, source files may be listed among in no particular order, but only the first reference will be completed." << endl;
     return EXIT_FAILURE;
   }
 
-  return parseArgsAndProceed(argc, argv);
+  char* tweaked_input = NULL;
+  for (int i = 0 ; i < argc ; ++i) {
+    const char* first = NULL;
+    if ((first = strchr(argv[i], ':'))) {
+      const char* second = NULL;
+      if ((second = strchr(first + 1, ':'))) {
+        if (first + 1 + strspn(first + 1, "0123456789") == second
+            && strspn(second + 1, "0123456789") == strlen(second + 1)) {
+          completionLocationStr = argv[i];
+          ptrdiff_t len = first - argv[i];
+          tweaked_input = new char [len + 1];
+          strncpy(tweaked_input, argv[i], len);
+          tweaked_input[len] = '\0';
+          argv[i] = tweaked_input;
+          break;
+        }
+      }
+    }
+  }
+
+  int rtn = parseArgsAndProceed(argc, argv);
+
+  if (tweaked_input)
+    delete[] tweaked_input;
+
+  return rtn;
 }
 
 int parseArgsAndProceed(int argc, const char* argv[])
@@ -167,6 +194,13 @@ int parseCC1AndProceed(int argc, const char* argv[])
 
   // Remove --disable-free
   ci.getFrontendOpts().DisableFree = false;
+
+  // Prepare for code completion
+  ci.getFrontendOpts().ProgramAction = clang::frontend::ParseSyntaxOnly;
+  ci.getFrontendOpts().CodeCompletionAt = clang::ParsedSourceLocation::FromString(completionLocationStr);
+  ci.getFrontendOpts().ShowMacrosInCodeCompletion = true;
+  ci.getFrontendOpts().ShowCodePatternsInCodeCompletion = true;
+  ci.getFrontendOpts().ShowGlobalSymbolsInCodeCompletion = true;
 
   llvm::install_fatal_error_handler(LLVMErrorHandler, static_cast<void*>(&ci.getDiagnostics()));
 
