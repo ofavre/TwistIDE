@@ -22,6 +22,7 @@ using namespace std;
 #include <clang/Frontend/Utils.h>
 #include <clang/FrontendTool/Utils.h>
 #include <clang/Frontend/FrontendDiagnostic.h>
+#include <clang/Frontend/ASTUnit.h>
 using namespace clang;
 using llvm::dyn_cast;
 using clang::driver::Arg;
@@ -44,11 +45,12 @@ using clang::driver::JobAction;
 using clang::driver::JobList;
 using clang::driver::Tool;
 using clang::driver::ToolChain;
+using clang::ParsedSourceLocation;
+using clang::ASTUnit;
 
 
 int parseArgsAndProceed(int argc, const char* argv[]);
 int parseCC1AndProceed(int argc, const char* argv[]);
-static void LLVMErrorHandler(void *UserData, const std::string &Message);
 
 static llvm::sys::Path GetExecutablePath(const char *Argv0, bool CanonicalPrefixes);
 int ExecuteCompilation(const Driver* that, const Compilation &C,
@@ -165,11 +167,6 @@ int parseArgsAndProceed(int argc, const char* argv[])
 
   cout << endl;
 
-  //!\\ The following doesn't quite work
-  //!\\ Tip: Use -### to print commands instead of executing them.
-  //!\\ ExecuteCompilation exec()s the this same program, with extra arguments.
-  //!\\ We should take advantage of the parsing done, and do the preprocess ourselves.
-
   int Res = 0;
   const Command *FailingCommand = 0;
   Res = ExecuteCompilation(&driver, *compil, FailingCommand);
@@ -195,31 +192,51 @@ int parseCC1AndProceed(int argc, const char* argv[])
   // Remove --disable-free
   ci.getFrontendOpts().DisableFree = false;
 
+  llvm::IntrusiveRefCntPtr<DiagnosticsEngine> diags (&ci.getDiagnostics());
+  OwningPtr<ASTUnit> astUnit (ASTUnit::LoadFromCompilerInvocation(&ci.getInvocation(), diags,
+      false, // OnlyLocalDecls
+      false, // CaptureDiagnostics
+      false, // PrecompilePreamble
+      clang::TU_Complete,
+      false // CacheCodeCompletionResults
+  ));
+
+  if (!astUnit)
+    return 1;
+
   // Prepare for code completion
-  ci.getFrontendOpts().ProgramAction = clang::frontend::ParseSyntaxOnly;
-  ci.getFrontendOpts().CodeCompletionAt = clang::ParsedSourceLocation::FromString(completionLocationStr);
-  ci.getFrontendOpts().ShowMacrosInCodeCompletion = true;
-  ci.getFrontendOpts().ShowCodePatternsInCodeCompletion = true;
-  ci.getFrontendOpts().ShowGlobalSymbolsInCodeCompletion = true;
+  PrintingCodeCompleteConsumer completionConsumer (
+      true, // IncludeMacros
+      true, // IncludeCodePatterns
+      true, // IncludeGlobals
+      llvm::outs()
+  );
+  SmallVector<StoredDiagnostic, 4> StoredDiagnostics;
+  SmallVector<const llvm::MemoryBuffer*, 4> OwnedBuffers;
+  ParsedSourceLocation parsedLoc = ParsedSourceLocation::FromString(completionLocationStr);
+  if (!ci.hasFileManager())
+    ci.createFileManager();
+  if (!ci.hasSourceManager())
+    ci.createSourceManager(ci.getFileManager());
 
-  llvm::install_fatal_error_handler(LLVMErrorHandler, static_cast<void*>(&ci.getDiagnostics()));
+  // Perform code completion
+  astUnit->CodeComplete(parsedLoc.FileName, parsedLoc.Line, parsedLoc.Column,
+      NULL, // RemappedFiles
+      0, // NumRemappedFiles
+      true, // IncludeMacros
+      true, // IncludeCodePatterns
+      completionConsumer,
+      ci.getDiagnostics(),
+      ci.getLangOpts(),
+      ci.getSourceManager(),
+      ci.getFileManager(),
+      StoredDiagnostics,
+      OwnedBuffers
+  );
 
-  int Res = 0;
-  Res = ExecuteCompilerInvocation(&ci) ? 0 : 1;
+  diags.resetWithoutRelease();
 
-  llvm::remove_fatal_error_handler();
-
-  return Res;
-}
-
-static void LLVMErrorHandler(void *UserData, const std::string &Message)
-{
-  DiagnosticsEngine &Diags = *static_cast<DiagnosticsEngine*>(UserData);
-
-  Diags.Report(diag::err_fe_error_backend) << Message;
-
-  // We cannot recover from llvm errors.
-  exit(1);
+  return 0;
 }
 
 
