@@ -84,23 +84,33 @@ int main(int argc, const char* argv[])
     return 1;
   }
 
+  // Add the ResourceDir as an include,
+  // because the ResourceFilesPath arg in ASTUnit
+  // does not work as expected.
+  int argc2 = argc + 2;
+  const char* argv2[argc2];
+  for (int i = 0 ; i < argc ; ++i)
+    argv2[i] = argv[i];
+  argv2[argc2-1-1] = "-I";
+  argv2[argc2  -1] = "/usr/local/lib/clang/3.1/include";
+
   DiagnosticOptions diagOpts;
   llvm::IntrusiveRefCntPtr<DiagnosticsEngine> diags (
     CompilerInstance::createDiagnostics(diagOpts, argc, argv)
   );
   OwningPtr<ASTUnit> astUnit (ASTUnit::LoadFromCommandLine(
-      argv + 1,
-      argv + argc,
+      argv2 + 1,
+      argv2 + argc2,
       diags,
-      "", // StringRef ResourceFilesPath, //!\\ Does not work! Add "-resource-dir /usr/local/lib/clang/3.1" to the arguments instead.
-      false, // bool OnlyLocalDecls,
-      false, // bool CaptureDiagnostics,
-      NULL, // RemappedFile *RemappedFiles,
-      0, // unsigned NumRemappedFiles,
-      true, // bool RemappedFilesKeepOriginalName,
-      false, // bool PrecompilePreamble,
-      clang::TU_Complete, // TranslationUnitKind TUKind,
-      false, // bool CacheCodeCompletionResults,
+      "", // StringRef ResourceFilesPath
+      false, // bool OnlyLocalDecls
+      false, // bool CaptureDiagnostics
+      NULL, // RemappedFile *RemappedFiles
+      0, // unsigned NumRemappedFiles
+      true, // bool RemappedFilesKeepOriginalName
+      false, // bool PrecompilePreamble
+      clang::TU_Complete, // TranslationUnitKind TUKind
+      false, // bool CacheCodeCompletionResults
       false // bool AllowPCHWithCompilerErrors
   ));
 
