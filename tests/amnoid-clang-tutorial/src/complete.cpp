@@ -145,8 +145,8 @@ void enter_interactive(Completer* _completer)
     }
     input.assign(str);
     // Trim
-    input.erase(0, input.find_first_not_of(" \t"));
-    input.erase(input.find_last_not_of(" \t"));
+    input.erase(0, max<size_t>(0, input.find_first_not_of(" \t")));
+    input.erase(min<size_t>(input.size(), input.find_last_not_of(" \t") + 1));
     // Check for empty lines
     if (input.empty()) {
       continue;
